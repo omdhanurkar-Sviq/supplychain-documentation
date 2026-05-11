@@ -1,0 +1,2876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>SupplyIQ — Intelligent Supply Chain Platform | SVIQ Solutions</title>
+<style>
+:root{
+  --bg:#0d1117;--panel:#161b22;--panel2:#1c2128;--border:#30363d;
+  --text:#e6edf3;--muted:#8b949e;--dim:#6e7681;
+  --blue:#58a6ff;--blue2:#1f6feb;--blue-dim:rgba(88,166,255,.08);
+  --green:#3fb950;--green-dim:rgba(63,185,80,.08);
+  --orange:#d29922;--orange-dim:rgba(210,153,34,.08);
+  --purple:#bc8cff;--purple-dim:rgba(188,140,255,.08);
+  --pink:#f778ba;--pink-dim:rgba(247,120,186,.08);
+  --teal:#39d353;--teal-dim:rgba(57,211,83,.08);
+  --red:#f85149;--red-dim:rgba(248,81,73,.08);
+  --cyan:#79c0ff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* bg grid */
+body::before{content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(88,166,255,.025) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(88,166,255,.025) 1px,transparent 1px);
+  background-size:48px 48px;pointer-events:none;z-index:0}
+
+/* ═══ HEADER ═══ */
+header{position:relative;z-index:1;text-align:center;padding:36px 24px 20px}
+header h1{font-size:2rem;font-weight:800;letter-spacing:-0.8px;
+  background:linear-gradient(135deg,var(--blue),var(--purple),var(--pink));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header .sub{color:var(--muted);font-size:.82rem;margin-top:6px}
+.badge-row{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.badge{padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:700;letter-spacing:.3px}
+.bd-blue  {background:rgba(88,166,255,.12);color:var(--blue);border:1px solid rgba(88,166,255,.3)}
+.bd-green {background:rgba(63,185,80,.12);color:var(--green);border:1px solid rgba(63,185,80,.3)}
+.bd-purple{background:rgba(188,140,255,.12);color:var(--purple);border:1px solid rgba(188,140,255,.3)}
+.bd-orange{background:rgba(210,153,34,.12);color:var(--orange);border:1px solid rgba(210,153,34,.3)}
+.bd-pink  {background:rgba(247,120,186,.12);color:var(--pink);border:1px solid rgba(247,120,186,.3)}
+.bd-teal  {background:rgba(57,211,83,.12);color:var(--teal);border:1px solid rgba(57,211,83,.3)}
+
+/* ═══ CANVAS ═══ */
+.canvas{max-width:1500px;margin:0 auto;padding:16px 20px 60px;position:relative;z-index:1}
+
+/* ═══ LAYER ═══ */
+.section-label{font-size:.63rem;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;
+  color:var(--muted);margin:22px 0 10px;padding-left:4px;display:flex;align-items:center;gap:10px}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.layer{border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;
+  position:relative;animation:fadeUp .5s ease both}
+.layer-client  {border-color:rgba(88,166,255,.4); background:linear-gradient(160deg,rgba(88,166,255,.05),var(--bg))}
+.layer-gateway {border-color:rgba(188,140,255,.4);background:linear-gradient(160deg,rgba(188,140,255,.05),var(--bg))}
+.layer-backend {border-color:rgba(63,185,80,.4);  background:linear-gradient(160deg,rgba(63,185,80,.05),var(--bg))}
+.layer-data    {border-color:rgba(210,153,34,.4); background:linear-gradient(160deg,rgba(210,153,34,.05),var(--bg))}
+.layer-ext     {border-color:rgba(248,81,73,.4);  background:linear-gradient(160deg,rgba(248,81,73,.05),var(--bg))}
+.layer-infra   {border-color:rgba(57,211,83,.4);  background:linear-gradient(160deg,rgba(57,211,83,.05),var(--bg))}
+
+/* ═══ ROW LABEL ═══ */
+.row-label{font-size:.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  color:var(--dim);margin:14px 0 7px;padding-left:2px}
+.row-label:first-child{margin-top:0}
+
+/* ═══ GRID ═══ */
+.grid-auto{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(148px,1fr))}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-4{grid-template-columns:repeat(4,1fr)}
+.grid-5{grid-template-columns:repeat(5,1fr)}
+.grid-6{grid-template-columns:repeat(6,1fr)}
+@media(max-width:900px){.grid-5,.grid-6{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.grid-2,.grid-3,.grid-4,.grid-5,.grid-6{grid-template-columns:1fr 1fr}}
+
+/* ═══ NODE ═══ */
+.node{background:var(--panel);border:1px solid var(--border);border-radius:10px;
+  padding:12px 13px;cursor:default;transition:transform .2s,box-shadow .2s,border-color .2s;
+  position:relative;overflow:hidden;display:flex;flex-direction:column;gap:4px;
+  animation:fadeUp .4s ease both}
+.node::after{content:'';position:absolute;inset:0;border-radius:10px;
+  background:radial-gradient(ellipse at 50% -10%,var(--node-glow,transparent) 0%,transparent 65%);
+  opacity:0;transition:opacity .3s;pointer-events:none}
+.node:hover{transform:translateY(-3px)}
+.node:hover::after{opacity:1}
+
+/* color variants */
+.n-blue  {--node-glow:rgba(88,166,255,.18); border-color:rgba(88,166,255,.35)}
+.n-blue:hover  {border-color:var(--blue);  box-shadow:0 8px 28px rgba(88,166,255,.2)}
+.n-green {--node-glow:rgba(63,185,80,.18);  border-color:rgba(63,185,80,.35)}
+.n-green:hover {border-color:var(--green); box-shadow:0 8px 28px rgba(63,185,80,.2)}
+.n-purple{--node-glow:rgba(188,140,255,.18);border-color:rgba(188,140,255,.35)}
+.n-purple:hover{border-color:var(--purple);box-shadow:0 8px 28px rgba(188,140,255,.2)}
+.n-orange{--node-glow:rgba(210,153,34,.18); border-color:rgba(210,153,34,.35)}
+.n-orange:hover{border-color:var(--orange);box-shadow:0 8px 28px rgba(210,153,34,.2)}
+.n-pink  {--node-glow:rgba(247,120,186,.18);border-color:rgba(247,120,186,.35)}
+.n-pink:hover  {border-color:var(--pink);  box-shadow:0 8px 28px rgba(247,120,186,.2)}
+.n-teal  {--node-glow:rgba(57,211,83,.18);  border-color:rgba(57,211,83,.35)}
+.n-teal:hover  {border-color:var(--teal);  box-shadow:0 8px 28px rgba(57,211,83,.2)}
+.n-red   {--node-glow:rgba(248,81,73,.18);  border-color:rgba(248,81,73,.35)}
+.n-red:hover   {border-color:var(--red);   box-shadow:0 8px 28px rgba(248,81,73,.2)}
+.n-cyan  {--node-glow:rgba(121,192,255,.18);border-color:rgba(121,192,255,.35)}
+.n-cyan:hover  {border-color:var(--cyan);  box-shadow:0 8px 28px rgba(121,192,255,.2)}
+
+.node-icon{font-size:1.3rem;line-height:1}
+.node-name{font-size:.75rem;font-weight:700;color:var(--text);line-height:1.25}
+.node-sub{font-size:.63rem;color:var(--muted);line-height:1.45}
+.node-sub b{color:var(--dim);font-weight:600}
+
+/* inline tags */
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.tag{padding:1px 6px;border-radius:4px;font-size:.58rem;font-weight:700;letter-spacing:.3px;white-space:nowrap}
+.t-blue  {background:rgba(88,166,255,.15);  color:var(--blue)}
+.t-green {background:rgba(63,185,80,.15);   color:var(--green)}
+.t-purple{background:rgba(188,140,255,.15); color:var(--purple)}
+.t-orange{background:rgba(210,153,34,.15);  color:var(--orange)}
+.t-pink  {background:rgba(247,120,186,.15); color:var(--pink)}
+.t-teal  {background:rgba(57,211,83,.15);   color:var(--teal)}
+.t-red   {background:rgba(248,81,73,.15);   color:var(--red)}
+.t-cyan  {background:rgba(121,192,255,.15); color:var(--cyan)}
+.t-dim   {background:rgba(110,118,129,.12); color:var(--dim)}
+
+/* pulse dot */
+.dot{position:absolute;top:10px;right:10px;width:7px;height:7px;border-radius:50%;animation:pulse 2s infinite}
+.dot-green {background:var(--green)}
+.dot-blue  {background:var(--blue);animation-delay:.4s}
+.dot-orange{background:var(--orange);animation-delay:.8s}
+.dot-purple{background:var(--purple);animation-delay:.6s}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 currentColor}60%{box-shadow:0 0 0 5px transparent}}
+.dot-green {color:rgba(63,185,80,.6)}
+.dot-blue  {color:rgba(88,166,255,.6)}
+.dot-orange{color:rgba(210,153,34,.6)}
+.dot-purple{color:rgba(188,140,255,.6)}
+
+/* ═══ INNER CARD (sub-architecture inside a node) ═══ */
+.inner-card{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-top:6px}
+.inner-title{font-size:.62rem;font-weight:700;color:var(--muted);letter-spacing:.5px;margin-bottom:6px;text-transform:uppercase}
+.inner-row{display:flex;flex-wrap:wrap;gap:5px}
+.chip{padding:2px 7px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:5px;
+  font-size:.59rem;color:var(--muted);font-family:'Consolas','Courier New',monospace;white-space:nowrap}
+.chip-blue  {border-color:rgba(88,166,255,.3);  color:var(--blue);  background:rgba(88,166,255,.06)}
+.chip-green {border-color:rgba(63,185,80,.3);   color:var(--green); background:rgba(63,185,80,.06)}
+.chip-orange{border-color:rgba(210,153,34,.3);  color:var(--orange);background:rgba(210,153,34,.06)}
+.chip-purple{border-color:rgba(188,140,255,.3); color:var(--purple);background:rgba(188,140,255,.06)}
+.chip-pink  {border-color:rgba(247,120,186,.3); color:var(--pink);  background:rgba(247,120,186,.06)}
+
+/* ═══ WIDE CARD (spans full width) ═══ */
+.wide-card{grid-column:1/-1;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.wide-card .wc-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.wide-card .wc-icon{font-size:1.2rem}
+.wide-card .wc-title{font-size:.75rem;font-weight:700}
+.wide-card .wc-sub{font-size:.63rem;color:var(--muted)}
+
+/* ═══ FLOW CONNECTOR ═══ */
+.connector{display:flex;align-items:center;justify-content:center;gap:16px;height:48px;margin:2px 0}
+.conn-arrow{display:flex;flex-direction:column;align-items:center;gap:0;height:36px;position:relative}
+.conn-arrow::before{content:'';width:2px;flex:1;background:linear-gradient(180deg,transparent,var(--border),transparent)}
+.conn-arrow::after{content:'▼';position:absolute;bottom:0;font-size:.55rem;color:var(--blue);opacity:.7}
+.conn-moving{width:2px;height:36px;position:relative;overflow:hidden}
+.conn-moving::after{content:'';position:absolute;width:2px;height:18px;top:-18px;
+  background:linear-gradient(180deg,transparent,var(--blue));
+  animation:flowDown 1.4s linear infinite}
+@keyframes flowDown{to{top:36px}}
+.conn-label{font-size:.62rem;color:var(--dim);font-family:'Consolas',monospace}
+
+/* ═══ KAFKA BAR ═══ */
+.kafka-bar{position:relative;overflow:hidden;border-radius:12px;padding:14px 18px;margin-bottom:14px;
+  border:1px solid rgba(210,153,34,.3);background:rgba(210,153,34,.05);
+  animation:kBorderPulse 3s ease infinite}
+@keyframes kBorderPulse{0%,100%{border-color:rgba(210,153,34,.2)}50%{border-color:rgba(210,153,34,.55)}}
+.kafka-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.kafka-title{font-size:.75rem;font-weight:700;color:var(--orange)}
+.kafka-stat{font-size:.63rem;color:var(--dim);margin-left:auto}
+.kafka-topics{display:flex;flex-wrap:wrap;gap:7px}
+.ktopic{padding:3px 10px;border-radius:20px;background:rgba(210,153,34,.12);
+  border:1px solid rgba(210,153,34,.25);font-size:.6rem;font-family:'Consolas',monospace;
+  color:var(--orange);animation:topicPulse 4s infinite}
+.ktopic:nth-child(1){animation-delay:0s}
+.ktopic:nth-child(2){animation-delay:.5s}
+.ktopic:nth-child(3){animation-delay:1s}
+.ktopic:nth-child(4){animation-delay:1.5s}
+.ktopic:nth-child(5){animation-delay:2s}
+.ktopic:nth-child(6){animation-delay:2.5s}
+.ktopic:nth-child(7){animation-delay:3s}
+@keyframes topicPulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.04)}}
+.kparticles{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.kp{position:absolute;width:5px;height:5px;border-radius:50%;background:var(--orange);
+  top:50%;transform:translateY(-50%);opacity:0;animation:kpMove 3.5s linear infinite}
+.kp:nth-child(1){animation-delay:0s}
+.kp:nth-child(2){animation-delay:.6s}
+.kp:nth-child(3){animation-delay:1.2s}
+.kp:nth-child(4){animation-delay:1.8s}
+.kp:nth-child(5){animation-delay:2.4s}
+.kp:nth-child(6){animation-delay:3s}
+@keyframes kpMove{0%{left:0%;opacity:0}8%{opacity:.9}92%{opacity:.9}100%{left:100%;opacity:0}}
+
+/* ═══ WEBSOCKET BAR ═══ */
+.ws-bar{display:flex;align-items:center;gap:14px;padding:8px 14px;border-radius:8px;margin-top:10px;
+  background:rgba(88,166,255,.05);border:1px solid rgba(88,166,255,.2)}
+.ws-title{font-size:.68rem;font-weight:700;color:var(--blue);white-space:nowrap}
+.ws-wave{display:flex;align-items:flex-end;gap:2px;height:18px}
+.wb{width:3px;background:var(--blue);border-radius:2px;animation:wave .7s ease infinite alternate}
+.wb:nth-child(1){animation-delay:0s;height:40%}
+.wb:nth-child(2){animation-delay:.07s;height:70%}
+.wb:nth-child(3){animation-delay:.14s;height:100%}
+.wb:nth-child(4){animation-delay:.21s;height:80%}
+.wb:nth-child(5){animation-delay:.28s;height:50%}
+.wb:nth-child(6){animation-delay:.35s;height:90%}
+.wb:nth-child(7){animation-delay:.42s;height:60%}
+.wb:nth-child(8){animation-delay:.49s;height:30%}
+.wb:nth-child(9){animation-delay:.56s;height:75%}
+.wb:nth-child(10){animation-delay:.63s;height:100%}
+@keyframes wave{from{opacity:.3;transform:scaleY(.4)}to{opacity:1;transform:scaleY(1)}}
+.ws-tags{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+
+/* ═══ PIPELINE CHAIN ═══ */
+.pipeline{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:8px 12px;
+  background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:7px;margin-top:10px;
+  grid-column:1/-1}
+.ps{padding:2px 8px;background:rgba(88,166,255,.1);border-radius:4px;
+  color:var(--blue);font-size:.62rem;font-family:'Consolas',monospace;white-space:nowrap}
+.ps-orange{background:rgba(210,153,34,.1);color:var(--orange)}
+.ps-green {background:rgba(63,185,80,.1); color:var(--green)}
+.ps-purple{background:rgba(188,140,255,.1);color:var(--purple)}
+.pa{color:var(--dim);font-size:.6rem}
+
+/* ═══ METRICS STRIP ═══ */
+.metrics{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:9px;margin:18px 0 6px}
+.mc{background:var(--panel);border:1px solid var(--border);border-radius:9px;padding:11px 14px;text-align:center}
+.mv{font-size:1.15rem;font-weight:800;line-height:1;margin-bottom:2px}
+.ml{font-size:.6rem;color:var(--muted);font-weight:600;letter-spacing:.3px}
+
+/* ═══ PLANNING LIFECYCLE ═══ */
+.lifecycle{grid-column:1/-1;padding:14px 16px;background:var(--panel);border:1px solid var(--border);
+  border-radius:10px;margin-top:2px}
+.lc-title{font-size:.68rem;font-weight:700;color:var(--muted);letter-spacing:.5px;
+  text-transform:uppercase;margin-bottom:10px}
+.lc-steps{display:flex;flex-wrap:wrap;gap:0;align-items:center}
+.lc-step{display:flex;flex-direction:column;align-items:center;padding:6px 10px;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:7px;
+  min-width:90px;flex:1}
+.lc-num{font-size:.58rem;font-weight:700;color:var(--dim);margin-bottom:3px}
+.lc-icon{font-size:1rem;margin-bottom:2px}
+.lc-name{font-size:.6rem;font-weight:700;color:var(--text);text-align:center;line-height:1.3}
+.lc-time{font-size:.55rem;color:var(--muted);margin-top:2px}
+.lc-arrow{font-size:.65rem;color:var(--orange);flex-shrink:0;margin:0 2px;animation:arrowBlink 1.5s infinite alternate}
+@keyframes arrowBlink{from{opacity:.3}to{opacity:1}}
+
+/* ═══ LEGEND ═══ */
+.legend{display:flex;gap:14px;flex-wrap:wrap;padding:12px 16px;background:var(--panel);
+  border:1px solid var(--border);border-radius:8px;margin-top:18px}
+.li{display:flex;align-items:center;gap:6px;font-size:.66rem;color:var(--muted)}
+.ld{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* ═══ TOOLTIP ═══ */
+#tip{position:fixed;background:#1c2128;border:1px solid var(--border);border-radius:9px;
+  padding:9px 13px;font-size:.7rem;color:var(--text);pointer-events:none;opacity:0;
+  transition:opacity .15s;z-index:9999;max-width:240px;line-height:1.55;
+  box-shadow:0 8px 36px rgba(0,0,0,.55)}
+
+/* ═══ SEPARATOR ═══ */
+.sep{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:6px 0}
+
+/* ═══ ANIMATIONS ═══ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.layer:nth-child(1){animation-delay:.04s}
+.layer:nth-child(2){animation-delay:.1s}
+.layer:nth-child(3){animation-delay:.16s}
+.layer:nth-child(4){animation-delay:.22s}
+.layer:nth-child(5){animation-delay:.28s}
+.layer:nth-child(6){animation-delay:.34s}
+
+/* ═══════════════════════════════════════════════════ */
+/* TAB NAVIGATION                                      */
+/* ═══════════════════════════════════════════════════ */
+.tab-nav{position:sticky;top:0;z-index:100;display:flex;gap:0;
+  background:rgba(13,17,23,.94);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);padding:0 24px}
+.tab-btn{padding:13px 22px;font-size:.82rem;font-weight:700;cursor:pointer;
+  border:none;background:transparent;color:var(--muted);
+  border-bottom:3px solid transparent;transition:color .2s,border-color .2s;
+  white-space:nowrap;letter-spacing:.2px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue)}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+
+/* ═══════════════════════════════════════════════════ */
+/* APP FLOW TAB                                        */
+/* ═══════════════════════════════════════════════════ */
+.af-canvas{max-width:1420px;margin:0 auto;padding:22px 20px 60px;position:relative;z-index:1}
+.af-intro{background:var(--panel);border:1px solid var(--border);border-radius:12px;
+  padding:18px 22px;margin-bottom:22px}
+.af-intro h2{font-size:1.1rem;font-weight:800;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+.af-intro p{font-size:.72rem;color:var(--muted);line-height:1.6}
+/* actor legend */
+.actor-legend{display:flex;gap:12px;flex-wrap:wrap;padding:12px 18px;
+  background:var(--panel);border:1px solid var(--border);border-radius:10px;margin-bottom:20px}
+.al-item{display:flex;align-items:center;gap:6px;font-size:.7rem;font-weight:700}
+.al-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+/* phase block */
+.phase-block{border-radius:14px;overflow:hidden;margin-bottom:8px;animation:fadeUp .5s ease both}
+.phase-hdr{padding:14px 18px;display:flex;align-items:center;gap:12px}
+.ph-num{font-size:.62rem;font-weight:800;letter-spacing:1.2px;opacity:.75}
+.ph-title{font-size:.97rem;font-weight:800;flex:1}
+.ph-actor{font-size:.66rem;font-weight:700;padding:3px 11px;border-radius:12px;white-space:nowrap}
+.ph-sa{background:rgba(248,81,73,.18);color:var(--red)}
+.ph-ad{background:rgba(210,153,34,.18);color:var(--orange)}
+.ph-pl{background:rgba(88,166,255,.18);color:var(--blue)}
+.ph-mg{background:rgba(63,185,80,.18);color:var(--green)}
+.ph-ex{background:rgba(188,140,255,.18);color:var(--purple)}
+.ph-sy{background:rgba(110,118,129,.14);color:var(--dim)}
+/* header color variants */
+.phdr-red   {background:linear-gradient(135deg,rgba(248,81,73,.13),rgba(248,81,73,.04));border:1px solid rgba(248,81,73,.28)}
+.phdr-orange{background:linear-gradient(135deg,rgba(210,153,34,.13),rgba(210,153,34,.04));border:1px solid rgba(210,153,34,.28)}
+.phdr-blue  {background:linear-gradient(135deg,rgba(88,166,255,.13),rgba(88,166,255,.04));border:1px solid rgba(88,166,255,.28)}
+.phdr-green {background:linear-gradient(135deg,rgba(63,185,80,.13),rgba(63,185,80,.04));border:1px solid rgba(63,185,80,.28)}
+.phdr-purple{background:linear-gradient(135deg,rgba(188,140,255,.13),rgba(188,140,255,.04));border:1px solid rgba(188,140,255,.28)}
+.phdr-teal  {background:linear-gradient(135deg,rgba(57,211,83,.13),rgba(57,211,83,.04));border:1px solid rgba(57,211,83,.28)}
+/* steps grid */
+.steps-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));
+  gap:1px;background:var(--border)}
+.fc-step{background:var(--panel);padding:14px 15px}
+.fc-step-n{font-size:.57rem;font-weight:800;color:var(--dim);letter-spacing:.6px;margin-bottom:5px}
+.fc-step-title{font-size:.75rem;font-weight:700;color:var(--text);margin-bottom:5px;line-height:1.3}
+.fc-step-desc{font-size:.63rem;color:var(--muted);line-height:1.5}
+.fc-step-detail{margin-top:6px;display:flex;flex-wrap:wrap;gap:3px}
+.step-chip{font-size:.58rem;padding:2px 7px;border-radius:4px;font-weight:700}
+.sc-blue  {background:rgba(88,166,255,.12);color:var(--blue)}
+.sc-green {background:rgba(63,185,80,.12);color:var(--green)}
+.sc-orange{background:rgba(210,153,34,.12);color:var(--orange)}
+.sc-purple{background:rgba(188,140,255,.12);color:var(--purple)}
+.sc-red   {background:rgba(248,81,73,.12);color:var(--red)}
+.sc-pink  {background:rgba(247,120,186,.12);color:var(--pink)}
+.sc-teal  {background:rgba(57,211,83,.12);color:var(--teal)}
+.sc-dim   {background:rgba(110,118,129,.1);color:var(--dim)}
+/* phase footer */
+.phase-footer{background:var(--panel2);border-top:1px solid var(--border);padding:11px 18px;
+  display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+.pf-block{display:flex;flex-direction:column;gap:3px;min-width:180px;flex:1}
+.pf-label{font-size:.57rem;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--dim);margin-bottom:2px}
+.pf-val{font-size:.66rem;color:var(--muted);line-height:1.55}
+/* phase connector arrow */
+.ph-conn{text-align:center;padding:6px 0;font-size:.72rem;color:var(--dim)}
+/* S&OP grid */
+.socp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border)}
+.socp-week{background:var(--panel);padding:16px}
+.socp-wnum{font-size:.59rem;font-weight:800;letter-spacing:.6px;color:var(--dim);margin-bottom:5px}
+.socp-wtitle{font-size:.8rem;font-weight:800;color:var(--text);margin-bottom:8px}
+.socp-items{display:flex;flex-direction:column;gap:5px}
+.socp-item{font-size:.63rem;color:var(--muted);line-height:1.4;display:flex;gap:5px}
+.socp-item::before{content:'▸';color:var(--teal);flex-shrink:0}
+@media(max-width:700px){.socp-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.socp-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="tip"></div>
+
+<!-- ═══════════════════ HEADER ═══════════════════ -->
+<header>
+  <h1>SupplyIQ</h1>
+  <p class="sub">by SVIQ Solutions &nbsp;·&nbsp; Intelligent Supply Chain Planning Platform &nbsp;·&nbsp; Multi-Tenant · Event-Driven · Cloud-Native</p>
+  <div class="badge-row">
+    <span class="badge bd-blue">React 18 + AG Grid</span>
+    <span class="badge bd-green">Fastify · Node.js</span>
+    <span class="badge bd-purple">PostgreSQL 16 RLS</span>
+    <span class="badge bd-orange">Apache Kafka</span>
+    <span class="badge bd-blue">ClickHouse OLAP</span>
+    <span class="badge bd-pink">Python · Prophet · LightGBM</span>
+    <span class="badge bd-teal">Kubernetes (EKS/AKS)</span>
+    <span class="badge bd-orange">Redis 7 Cluster</span>
+    <span class="badge bd-purple">Kong Gateway</span>
+  </div>
+</header>
+
+<!-- ═══════════════════ TAB NAVIGATION ═══════════════════ -->
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('arch')">🏗️ System Architecture</button>
+  <button class="tab-btn" onclick="switchTab('flow')">🗺️ Application Flow A→Z</button>
+</nav>
+
+<!-- ══════════ TAB 1: ARCHITECTURE ══════════ -->
+<div id="tab-arch" class="tab-pane active">
+<div class="canvas">
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- LAYER 1 — CLIENT                                              -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="section-label">① Client Layer — React 18 SPA</div>
+<div class="layer layer-client">
+
+  <!-- ROW A: Pages / Routes -->
+  <div class="row-label">Pages &amp; Routes (TanStack Router)</div>
+  <div class="grid-auto" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr))">
+
+    <div class="node n-blue" data-tip="Planning Grid page — full-screen AG Grid Enterprise. Dimensions × Measures × Time matrix. Context menus, formula bar, multi-select, copy-paste, undo/redo. Server-side row model streams rows on demand.">
+      <span class="node-icon">📊</span>
+      <div class="node-name">Planning Grid</div>
+      <div class="node-sub">Demand / Supply / Financial</div>
+      <div class="inner-card">
+        <div class="inner-title">AG Grid Enterprise</div>
+        <div class="inner-row">
+          <span class="chip chip-blue">Server-Side RM</span>
+          <span class="chip chip-blue">Pivot Mode</span>
+          <span class="chip chip-blue">Formula Bar</span>
+          <span class="chip chip-blue">Excel Export</span>
+          <span class="chip chip-blue">Virtual Scroll</span>
+          <span class="chip chip-blue">Undo/Redo</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-blue">1M+ rows</span><span class="tag t-purple">Real-time WS</span></div>
+    </div>
+
+    <div class="node n-blue" data-tip="Analytics Dashboard — KPI cards (trend arrows), time-series line charts, bar/pie distribution, heatmaps via Apache ECharts. Widgets are configurable per tenant. Refreshes every 30s or on WS push.">
+      <span class="node-icon">📈</span>
+      <div class="node-name">Analytics Dashboard</div>
+      <div class="node-sub">KPI · Charts · Pivot</div>
+      <div class="inner-card">
+        <div class="inner-title">Apache ECharts</div>
+        <div class="inner-row">
+          <span class="chip chip-blue">Line / Bar / Pie</span>
+          <span class="chip chip-blue">Heatmap</span>
+          <span class="chip chip-blue">Waterfall</span>
+          <span class="chip chip-blue">KPI Cards</span>
+          <span class="chip chip-blue">Scatter</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-blue">Auto-refresh</span><span class="tag t-green">Configurable</span></div>
+    </div>
+
+    <div class="node n-blue" data-tip="Scenario Planning page — create what-if branches, copy-on-write data isolation, side-by-side scenario comparison table, variance analysis charts. Fork/merge/discard scenarios.">
+      <span class="node-icon">🔀</span>
+      <div class="node-name">Scenario Planning</div>
+      <div class="node-sub">What-if · Branching</div>
+      <div class="inner-card">
+        <div class="inner-title">Scenario Engine UI</div>
+        <div class="inner-row">
+          <span class="chip chip-purple">Copy-on-Write</span>
+          <span class="chip chip-purple">Fork / Merge</span>
+          <span class="chip chip-purple">Variance View</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-purple">Side-by-side compare</span></div>
+    </div>
+
+    <div class="node n-blue" data-tip="Workflow Management — view open tasks, approve/reject steps, see SLA countdowns, comment threads. Displays routing history, escalation paths, and completion audit trail.">
+      <span class="node-icon">✅</span>
+      <div class="node-name">Workflow &amp; Approvals</div>
+      <div class="node-sub">Multi-step · SLA tracker</div>
+      <div class="inner-card">
+        <div class="inner-title">Task Board UI</div>
+        <div class="inner-row">
+          <span class="chip chip-green">My Tasks</span>
+          <span class="chip chip-green">Approve/Reject</span>
+          <span class="chip chip-green">SLA Countdown</span>
+          <span class="chip chip-green">Audit Trail</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-green">Notifications</span></div>
+    </div>
+
+    <div class="node n-blue" data-tip="Report Builder — drag-and-drop column selector, filter builder, group-by, sort, scheduled export. Outputs Excel, CSV, PDF. Saved report templates per tenant.">
+      <span class="node-icon">📄</span>
+      <div class="node-name">Report Builder</div>
+      <div class="node-sub">Dynamic · Scheduled</div>
+      <div class="inner-card">
+        <div class="inner-title">Builder UI</div>
+        <div class="inner-row">
+          <span class="chip chip-orange">Column Picker</span>
+          <span class="chip chip-orange">Filter Builder</span>
+          <span class="chip chip-orange">Excel · PDF</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-orange">Scheduled export</span></div>
+    </div>
+
+    <div class="node n-blue" data-tip="Admin Panel — tenant configuration, entity/field builder, form layout designer, user management (RBAC roles), subscription settings, API keys, audit log viewer.">
+      <span class="node-icon">⚙️</span>
+      <div class="node-name">Admin Panel</div>
+      <div class="node-sub">Tenant · Users · Config</div>
+      <div class="inner-card">
+        <div class="inner-title">Config UI</div>
+        <div class="inner-row">
+          <span class="chip chip-pink">Entity Builder</span>
+          <span class="chip chip-pink">Field Designer</span>
+          <span class="chip chip-pink">Role Manager</span>
+          <span class="chip chip-pink">Billing</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-pink">Metadata-driven</span></div>
+    </div>
+
+    <div class="node n-blue" data-tip="Integration Hub — file upload wizard (drag-drop), column mapping, row preview, validation errors. ERP sync status dashboard, last-sync timestamps, retry failed jobs.">
+      <span class="node-icon">🔌</span>
+      <div class="node-name">Integration Hub</div>
+      <div class="node-sub">Import Wizard · ERP Status</div>
+      <div class="inner-card">
+        <div class="inner-title">Import UI</div>
+        <div class="inner-row">
+          <span class="chip chip-orange">Drag-Drop Upload</span>
+          <span class="chip chip-orange">Column Map</span>
+          <span class="chip chip-orange">Validation</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-orange">SAP · Oracle</span></div>
+    </div>
+
+    <div class="node n-blue" data-tip="Forecasting UI — view ML model runs, accuracy metrics (MAPE, RMSE), override AI forecast cells manually in the grid, see anomaly detection highlights, configure model parameters.">
+      <span class="node-icon">🤖</span>
+      <div class="node-name">Forecast Explorer</div>
+      <div class="node-sub">ML Results · Overrides</div>
+      <div class="inner-card">
+        <div class="inner-title">Forecast UI</div>
+        <div class="inner-row">
+          <span class="chip chip-pink">MAPE / RMSE</span>
+          <span class="chip chip-pink">Anomaly Alerts</span>
+          <span class="chip chip-pink">Override Cells</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-pink">AI-assisted</span></div>
+    </div>
+
+  </div><!-- /grid pages -->
+
+  <div class="sep" style="margin:12px 0"></div>
+
+  <!-- ROW B: Frontend Architecture -->
+  <div class="row-label">Frontend Architecture — State · API · Realtime</div>
+  <div class="grid-auto" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))">
+
+    <div class="node n-cyan" data-tip="TanStack Router — type-safe SPA routing. Lazy-loaded route modules, code-splitting per page. Search params for filters/pagination. Auth guard HOC for protected routes.">
+      <span class="node-icon">🗺️</span>
+      <div class="node-name">TanStack Router</div>
+      <div class="node-sub">Type-safe SPA routing</div>
+      <div class="tags">
+        <span class="tag t-cyan">Lazy Routes</span>
+        <span class="tag t-cyan">Code Split</span>
+        <span class="tag t-cyan">Auth Guard</span>
+      </div>
+    </div>
+
+    <div class="node n-cyan" data-tip="Zustand stores: authStore (user/tenant/JWT), uiStore (sidebar, modals, theme), gridStore (selected cells, active scenario, sort/filter state). Persist to localStorage for session survival.">
+      <span class="node-icon">🗃️</span>
+      <div class="node-name">Zustand Stores</div>
+      <div class="node-sub">Global client state</div>
+      <div class="inner-card">
+        <div class="inner-title">Stores</div>
+        <div class="inner-row">
+          <span class="chip chip-blue">authStore</span>
+          <span class="chip chip-blue">uiStore</span>
+          <span class="chip chip-blue">gridStore</span>
+          <span class="chip chip-blue">scenarioStore</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="node n-cyan" data-tip="TanStack Query v5 — server state management. All API calls wrapped in useQuery/useMutation. Stale-while-revalidate, optimistic updates, infinite scroll pagination. Query invalidation on WS events.">
+      <span class="node-icon">🔄</span>
+      <div class="node-name">TanStack Query v5</div>
+      <div class="node-sub">Server state · Cache</div>
+      <div class="inner-card">
+        <div class="inner-title">Patterns</div>
+        <div class="inner-row">
+          <span class="chip chip-green">useQuery</span>
+          <span class="chip chip-green">useMutation</span>
+          <span class="chip chip-green">Optimistic UI</span>
+          <span class="chip chip-green">Stale-while-revalidate</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="node n-cyan" data-tip="React Hook Form + Zod — all forms (entity builder, filter builder, import wizard, user creation). Zod schemas shared with backend for type safety. Inline field-level validation.">
+      <span class="node-icon">📝</span>
+      <div class="node-name">React Hook Form</div>
+      <div class="node-sub">Forms + Zod validation</div>
+      <div class="inner-card">
+        <div class="inner-title">Validation</div>
+        <div class="inner-row">
+          <span class="chip chip-orange">Zod Schemas</span>
+          <span class="chip chip-orange">Field-level errors</span>
+          <span class="chip chip-orange">Shared w/ backend</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="node n-cyan" data-tip="Shadcn/ui component library on top of Tailwind CSS. Design tokens from CSS variables. Dark mode by default. Accessible (ARIA), keyboard-navigable. All components match SupplyIQ brand tokens.">
+      <span class="node-icon">🎨</span>
+      <div class="node-name">Shadcn/ui + Tailwind</div>
+      <div class="node-sub">Design system</div>
+      <div class="inner-card">
+        <div class="inner-title">Components</div>
+        <div class="inner-row">
+          <span class="chip chip-purple">Design tokens</span>
+          <span class="chip chip-purple">ARIA a11y</span>
+          <span class="chip chip-purple">Dark mode</span>
+          <span class="chip chip-purple">Brand</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="node n-cyan" data-tip="Socket.io client — maintains persistent WS connection. Subscribes to tenant.{id} room. Receives: cell-changed events → invalidates TanStack Query cache, KPI-updated → re-renders charts, workflow-step → updates task list.">
+      <span class="node-icon">⚡</span>
+      <div class="node-name">Socket.io Client</div>
+      <div class="node-sub">Real-time subscriptions</div>
+      <div class="inner-card">
+        <div class="inner-title">Events received</div>
+        <div class="inner-row">
+          <span class="chip chip-blue">cell.changed</span>
+          <span class="chip chip-blue">kpi.updated</span>
+          <span class="chip chip-blue">workflow.step</span>
+          <span class="chip chip-blue">user.presence</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="node n-cyan" data-tip="Axios API client with interceptors — attaches JWT Bearer token to every request, handles 401 token refresh (silent re-auth), retries on network errors, logs telemetry. Tenant subdomain auto-resolved.">
+      <span class="node-icon">📡</span>
+      <div class="node-name">Axios API Client</div>
+      <div class="node-sub">HTTP + interceptors</div>
+      <div class="inner-card">
+        <div class="inner-title">Interceptors</div>
+        <div class="inner-row">
+          <span class="chip chip-green">JWT attach</span>
+          <span class="chip chip-green">401 refresh</span>
+          <span class="chip chip-green">Retry</span>
+          <span class="chip chip-green">Telemetry</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="node n-cyan" data-tip="Service Worker — offline support for read-only views, push notifications for workflow approvals and SLA alerts via browser Web Push API. Background sync for pending cell edits.">
+      <span class="node-icon">🔧</span>
+      <div class="node-name">Service Worker</div>
+      <div class="node-sub">Offline · Push Notifications</div>
+      <div class="tags">
+        <span class="tag t-cyan">Background sync</span>
+        <span class="tag t-cyan">Web Push</span>
+      </div>
+    </div>
+
+  </div><!-- /grid frontend arch -->
+
+  <!-- WebSocket bar -->
+  <div class="ws-bar">
+    <span class="ws-title">⚡ Socket.io WebSocket — Live Collaboration</span>
+    <div class="ws-wave">
+      <div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div>
+      <div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div>
+      <div class="wb"></div><div class="wb"></div>
+    </div>
+    <div class="ws-tags">
+      <span class="tag t-blue">Grid cell updates</span>
+      <span class="tag t-blue">KPI refresh</span>
+      <span class="tag t-blue">Approval notifications</span>
+      <span class="tag t-blue">User presence</span>
+      <span class="tag t-blue">Formula recalc progress</span>
+    </div>
+  </div>
+
+</div><!-- /layer client -->
+
+<!-- CONNECTOR -->
+<div class="connector">
+  <div class="conn-moving"></div>
+  <span class="conn-label">HTTPS · JWT RS256 · REST + WebSocket</span>
+  <div class="conn-moving"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- LAYER 2 — GATEWAY                                             -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="section-label">② Edge &amp; Gateway Layer</div>
+<div class="layer layer-gateway">
+  <div class="grid-auto" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
+
+    <div class="node n-purple" data-tip="Cloudflare — global CDN + WAF. Static assets served at edge (< 50ms globally). DDoS protection, IP reputation filtering. Wildcard DNS: *.supplychain.com → Load Balancer. TLS termination.">
+      <div class="dot dot-green"></div>
+      <span class="node-icon">🛡️</span>
+      <div class="node-name">Cloudflare CDN + WAF</div>
+      <div class="node-sub">Global edge · DDoS protection</div>
+      <div class="inner-card">
+        <div class="inner-title">Features</div>
+        <div class="inner-row">
+          <span class="chip chip-purple">*.supplychain.com</span>
+          <span class="chip chip-purple">TLS termination</span>
+          <span class="chip chip-purple">Static asset CDN</span>
+          <span class="chip chip-purple">IP reputation filter</span>
+          <span class="chip chip-purple">Bot protection</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="node n-purple" data-tip="Kong API Gateway — extracts tenant_id from subdomain (chemcorp.supplychain.com → tenant_id=42). Validates JWT RS256. Per-tenant rate limits from plan: Basic=100 req/min, Pro=1K, Enterprise=10K. Routes to correct service.">
+      <div class="dot dot-green"></div>
+      <span class="node-icon">🔀</span>
+      <div class="node-name">Kong API Gateway</div>
+      <div class="node-sub">Routing · Rate limit · JWT</div>
+      <div class="inner-card">
+        <div class="inner-title">Plugins active</div>
+        <div class="inner-row">
+          <span class="chip chip-purple">jwt-auth</span>
+          <span class="chip chip-purple">rate-limiting</span>
+          <span class="chip chip-purple">tenant-resolver</span>
+          <span class="chip chip-purple">request-logging</span>
+          <span class="chip chip-purple">cors</span>
+          <span class="chip chip-purple">response-cache</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-green">78K req/s passthrough</span></div>
+    </div>
+
+    <div class="node n-purple" data-tip="Auth Service — handles login (email/password, SSO SAML2.0), issues JWT RS256 (15 min access + 7d refresh). Redis-backed session invalidation. RBAC role check middleware, ABAC attribute policies.">
+      <span class="node-icon">🔐</span>
+      <div class="node-name">Auth &amp; Permission Service</div>
+      <div class="node-sub">JWT · RBAC · ABAC · SSO</div>
+      <div class="inner-card">
+        <div class="inner-title">Auth flow</div>
+        <div class="inner-row">
+          <span class="chip chip-purple">JWT RS256 (15m/7d)</span>
+          <span class="chip chip-purple">SAML 2.0 SSO</span>
+          <span class="chip chip-purple">RBAC middleware</span>
+          <span class="chip chip-purple">ABAC policies</span>
+          <span class="chip chip-purple">Field masking</span>
+          <span class="chip chip-purple">Row-level filter</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="node n-purple" data-tip="Redis 7 (Valkey) — session cache (JWT revocation list), rate-limit counters per tenant+route, feature flag state (per-plan entitlements), distributed locks for concurrent grid edits. 6-node cluster.">
+      <div class="dot dot-orange"></div>
+      <span class="node-icon">⚡</span>
+      <div class="node-name">Redis 7 (Valkey)</div>
+      <div class="node-sub">Sessions · Rate limits · Locks</div>
+      <div class="inner-card">
+        <div class="inner-title">Key namespaces</div>
+        <div class="inner-row">
+          <span class="chip chip-orange">sess:{token}</span>
+          <span class="chip chip-orange">rate:{tenant}:{route}</span>
+          <span class="chip chip-orange">flag:{tenant}:{feature}</span>
+          <span class="chip chip-orange">lock:{cell_id}</span>
+          <span class="chip chip-orange">cache:{query_hash}</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-orange">6 nodes · 16GB ea</span></div>
+    </div>
+
+  </div>
+</div><!-- /layer gateway -->
+
+<!-- CONNECTOR -->
+<div class="connector">
+  <div class="conn-moving"></div>
+  <span class="conn-label">Internal mTLS service mesh</span>
+  <div class="conn-moving"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- LAYER 3 — BACKEND MICROSERVICES                               -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="section-label">③ Backend Microservices Layer (Kubernetes · Node.js · Python)</div>
+<div class="layer layer-backend">
+
+  <!-- ROW A: Core API + Engines -->
+  <div class="row-label">Core API &amp; Compute Engines</div>
+  <div class="grid-auto" style="grid-template-columns:repeat(auto-fill,minmax(210px,1fr))">
+
+    <div class="node n-green" data-tip="Fastify API Service — primary HTTP/WS server. 78K req/s throughput. Plugin architecture: tenant-context, auth-middleware, zod-serializer. BullMQ for job dispatch. All routes prefixed /api/v1/. 3 replicas.">
+      <div class="dot dot-green"></div>
+      <span class="node-icon">🚀</span>
+      <div class="node-name">API Service (Fastify)</div>
+      <div class="node-sub">Primary HTTP · 78K req/s</div>
+      <div class="inner-card">
+        <div class="inner-title">Route groups</div>
+        <div class="inner-row">
+          <span class="chip chip-green">POST /auth/*</span>
+          <span class="chip chip-green">GET /entities/:id/records</span>
+          <span class="chip chip-green">PUT /planning/cells</span>
+          <span class="chip chip-green">POST /workflows/:id/submit</span>
+          <span class="chip chip-green">GET /reports/:id/data</span>
+          <span class="chip chip-green">WS /socket.io</span>
+        </div>
+      </div>
+      <div class="inner-card" style="margin-top:5px">
+        <div class="inner-title">Fastify plugins</div>
+        <div class="inner-row">
+          <span class="chip chip-green">@fastify/jwt</span>
+          <span class="chip chip-green">fastify-zod</span>
+          <span class="chip chip-green">@fastify/rate-limit</span>
+          <span class="chip chip-green">@fastify/multipart</span>
+          <span class="chip chip-green">BullMQ adapter</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-green">3 replicas · 512MB</span><span class="tag t-dim">Zod validation</span></div>
+    </div>
+
+    <div class="node n-green" data-tip="Cube Engine — multidimensional OLAP. Manages Hyperblock (in-memory cell store). Receives cell.changed Kafka events, resolves dirty cells via formula dependency graph, aggregates up the tree. HPA scales 5-20 replicas.">
+      <div class="dot dot-orange"></div>
+      <span class="node-icon">🧮</span>
+      <div class="node-name">Cube Engine (OLAP)</div>
+      <div class="node-sub">Multidimensional recalculation</div>
+      <div class="inner-card">
+        <div class="inner-title">Internal pipeline</div>
+        <div class="inner-row">
+          <span class="chip chip-orange">Hyperblock cell store</span>
+          <span class="chip chip-orange">Dimension hierarchy</span>
+          <span class="chip chip-orange">Aggregation tree</span>
+          <span class="chip chip-orange">Dirty cell queue</span>
+          <span class="chip chip-orange">Cache invalidation</span>
+          <span class="chip chip-orange">Slice &amp; dice</span>
+        </div>
+      </div>
+      <div class="inner-card" style="margin-top:5px">
+        <div class="inner-title">Aggregation functions</div>
+        <div class="inner-row">
+          <span class="chip chip-orange">SUM / AVG / MAX</span>
+          <span class="chip chip-orange">WEIGHTED_AVG</span>
+          <span class="chip chip-orange">FIRST_CHILD</span>
+          <span class="chip chip-orange">CUSTOM_FORMULA</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-orange">5–20 replicas (HPA)</span><span class="tag t-orange">4GB ea · CPU-heavy</span></div>
+    </div>
+
+    <div class="node n-green" data-tip="Formula Engine — full expression language. Lexer → Parser → AST → Evaluator. Dependency graph prevents circular refs. Recalculates only downstream dirty cells. Supply chain functions: MRP, DRP, SAFETY_STOCK, FORECAST_ERROR.">
+      <span class="node-icon">🔢</span>
+      <div class="node-name">Formula Engine</div>
+      <div class="node-sub">AST · Dependency graph</div>
+      <div class="inner-card">
+        <div class="inner-title">Pipeline stages</div>
+        <div class="inner-row">
+          <span class="chip chip-purple">Lexer (tokenize)</span>
+          <span class="chip chip-purple">Parser (→ AST)</span>
+          <span class="chip chip-purple">Dep graph build</span>
+          <span class="chip chip-purple">Circular detection</span>
+          <span class="chip chip-purple">Evaluator</span>
+          <span class="chip chip-purple">Result cache</span>
+        </div>
+      </div>
+      <div class="inner-card" style="margin-top:5px">
+        <div class="inner-title">Supply chain functions</div>
+        <div class="inner-row">
+          <span class="chip chip-green">MRP()</span>
+          <span class="chip chip-green">DRP()</span>
+          <span class="chip chip-green">SAFETY_STOCK()</span>
+          <span class="chip chip-green">FORECAST()</span>
+          <span class="chip chip-green">LEADTIME_ADJ()</span>
+          <span class="chip chip-green">DAYS_OF_SUPPLY()</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-purple">3 replicas · 1GB</span></div>
+    </div>
+
+    <div class="node n-green" data-tip="Metadata Engine — manages dynamic entity definitions, field configs, form layouts, table views. Schema cache in Redis (5 min TTL). All JSONB record shapes derived from metadata. Zero downtime schema changes via metadata versioning.">
+      <span class="node-icon">🗄️</span>
+      <div class="node-name">Metadata Engine</div>
+      <div class="node-sub">Dynamic entity definitions</div>
+      <div class="inner-card">
+        <div class="inner-title">Manages</div>
+        <div class="inner-row">
+          <span class="chip chip-blue">Entity definitions</span>
+          <span class="chip chip-blue">Field configs</span>
+          <span class="chip chip-blue">Form layouts</span>
+          <span class="chip chip-blue">Table views</span>
+          <span class="chip chip-blue">Validation rules</span>
+          <span class="chip chip-blue">Relationships</span>
+        </div>
+      </div>
+      <div class="inner-card" style="margin-top:5px">
+        <div class="inner-title">Cache strategy</div>
+        <div class="inner-row">
+          <span class="chip chip-orange">Redis 5m TTL</span>
+          <span class="chip chip-orange">On-invalidate broadcast</span>
+          <span class="chip chip-orange">Version hash check</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-blue">JSONB-backed</span><span class="tag t-blue">Zero-downtime</span></div>
+    </div>
+
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- ROW B: Workflow + Reporting + Integration + Notification -->
+  <div class="row-label">Business Logic Services</div>
+  <div class="grid-auto" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
+
+    <div class="node n-green" data-tip="Workflow Engine — finite state machine per workflow instance. Routing rules engine (if role=Planning Manager AND region=EU → approver=X). SLA timers via BullMQ delayed jobs. Email+WS notifications on step transitions. 2 replicas.">
+      <span class="node-icon">🔄</span>
+      <div class="node-name">Workflow Engine</div>
+      <div class="node-sub">State machine · Approvals · SLA</div>
+      <div class="inner-card">
+        <div class="inner-title">State machine</div>
+        <div class="inner-row">
+          <span class="chip chip-green">DRAFT → SUBMITTED</span>
+          <span class="chip chip-green">→ IN_REVIEW</span>
+          <span class="chip chip-green">→ APPROVED / REJECTED</span>
+          <span class="chip chip-green">→ ESCALATED</span>
+        </div>
+      </div>
+      <div class="inner-card" style="margin-top:5px">
+        <div class="inner-title">Routing engine</div>
+        <div class="inner-row">
+          <span class="chip chip-green">Role-based routing</span>
+          <span class="chip chip-green">Region rules</span>
+          <span class="chip chip-green">Escalation timer</span>
+          <span class="chip chip-green">Parallel approvals</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-green">2 replicas · 512MB</span></div>
+    </div>
+
+    <div class="node n-green" data-tip="Reporting Service — SQL builder generates ClickHouse queries from user-defined filter/group/sort config. Handles pivot (PIVOT BY month × region × product). Async PDF generation via Puppeteer, Excel via ExcelJS. 3 replicas × 1GB.">
+      <span class="node-icon">📊</span>
+      <div class="node-name">Reporting Service</div>
+      <div class="node-sub">Dynamic SQL · Pivot · Export</div>
+      <div class="inner-card">
+        <div class="inner-title">Components</div>
+        <div class="inner-row">
+          <span class="chip chip-blue">SQL query builder</span>
+          <span class="chip chip-blue">ClickHouse adapter</span>
+          <span class="chip chip-blue">Pivot transformer</span>
+          <span class="chip chip-blue">ExcelJS writer</span>
+          <span class="chip chip-blue">Puppeteer PDF</span>
+          <span class="chip chip-blue">S3 upload</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-blue">3 replicas · 1GB</span><span class="tag t-orange">300ms OLAP query</span></div>
+    </div>
+
+    <div class="node n-green" data-tip="Integration Service — SAP RFC/BAPI connector (node-rfc), Oracle REST (OAuth2). ETL pipeline: extract → validate → transform → load. BullMQ job per sync. Conflict resolution: last-write-wins for actuals, lock for master data.">
+      <span class="node-icon">🔌</span>
+      <div class="node-name">Integration Service</div>
+      <div class="node-sub">SAP · Oracle · ETL pipeline</div>
+      <div class="inner-card">
+        <div class="inner-title">ETL pipeline</div>
+        <div class="inner-row">
+          <span class="chip chip-orange">Extract (SAP RFC)</span>
+          <span class="chip chip-orange">Validate schema</span>
+          <span class="chip chip-orange">Transform (map fields)</span>
+          <span class="chip chip-orange">Deduplicate</span>
+          <span class="chip chip-orange">Load (upsert)</span>
+          <span class="chip chip-orange">Conflict resolve</span>
+        </div>
+      </div>
+      <div class="inner-card" style="margin-top:5px">
+        <div class="inner-title">File import pipeline</div>
+        <div class="inner-row">
+          <span class="chip chip-orange">S3 upload</span>
+          <span class="chip chip-orange">SheetJS parse</span>
+          <span class="chip chip-orange">Column mapping</span>
+          <span class="chip chip-orange">Row validation</span>
+          <span class="chip chip-orange">Async bulk insert</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-orange">2 replicas · 512MB</span></div>
+    </div>
+
+    <div class="node n-green" data-tip="Notification Service — fan-out on Kafka events to email + WS + Slack. Email rendered via MJML templates (branded HTML). Delivery tracking table. Retry with exponential backoff (3 attempts). User prefs: mute channels, digest mode, DND hours.">
+      <span class="node-icon">🔔</span>
+      <div class="node-name">Notification Service</div>
+      <div class="node-sub">Email · WebSocket · Slack</div>
+      <div class="inner-card">
+        <div class="inner-title">Delivery channels</div>
+        <div class="inner-row">
+          <span class="chip chip-blue">SendGrid / SES email</span>
+          <span class="chip chip-blue">Socket.io push</span>
+          <span class="chip chip-blue">Slack webhook</span>
+          <span class="chip chip-blue">Browser Push API</span>
+        </div>
+      </div>
+      <div class="inner-card" style="margin-top:5px">
+        <div class="inner-title">Reliability</div>
+        <div class="inner-row">
+          <span class="chip chip-green">Kafka consumer</span>
+          <span class="chip chip-green">Delivery tracking</span>
+          <span class="chip chip-green">Retry + backoff</span>
+          <span class="chip chip-green">User prefs + DND</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-blue">2 replicas · 256MB</span></div>
+    </div>
+
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- ROW C: ML Forecasting Service (Python) -->
+  <div class="row-label">ML / Forecasting Service — Python · FastAPI</div>
+  <div class="grid-auto" style="grid-template-columns:repeat(auto-fill,minmax(195px,1fr))">
+
+    <div class="node n-pink" data-tip="FastAPI service entry — async Python. Pydantic v2 models for request/response. Receives forecast requests from BullMQ via HTTP. Returns job_id immediately, results published to Kafka when done.">
+      <div class="dot dot-purple"></div>
+      <span class="node-icon">🐍</span>
+      <div class="node-name">FastAPI Service</div>
+      <div class="node-sub">Python async · Pydantic v2</div>
+      <div class="inner-card">
+        <div class="inner-title">Endpoints</div>
+        <div class="inner-row">
+          <span class="chip chip-pink">POST /forecast/run</span>
+          <span class="chip chip-pink">GET /forecast/{job_id}</span>
+          <span class="chip chip-pink">POST /anomaly/detect</span>
+          <span class="chip chip-pink">GET /model/accuracy</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-pink">2 replicas · 2GB</span></div>
+    </div>
+
+    <div class="node n-pink" data-tip="Model selection — auto-picks best model per SKU/location based on historical MAPE. ARIMA for stationary series, Prophet for trend+seasonality, LightGBM for external regressors (price, promotions). Ensemble blends all three.">
+      <span class="node-icon">🧠</span>
+      <div class="node-name">Model Selector</div>
+      <div class="node-sub">Auto-pick best algorithm</div>
+      <div class="inner-card">
+        <div class="inner-title">Models</div>
+        <div class="inner-row">
+          <span class="chip chip-pink">ARIMA (statsmodels)</span>
+          <span class="chip chip-pink">Prophet (Meta)</span>
+          <span class="chip chip-pink">LightGBM (trees)</span>
+          <span class="chip chip-pink">Ensemble blend</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-pink">Auto MAPE selection</span></div>
+    </div>
+
+    <div class="node n-pink" data-tip="Feature Store — raw actuals from PostgreSQL + Redis cache. Feature engineering: lag features (t-1, t-4, t-12), rolling stats (mean, std, min, max), calendar features (holiday flags, day-of-week), external regressors (weather, price index).">
+      <span class="node-icon">🗂️</span>
+      <div class="node-name">Feature Store</div>
+      <div class="node-sub">Feature engineering</div>
+      <div class="inner-card">
+        <div class="inner-title">Features</div>
+        <div class="inner-row">
+          <span class="chip chip-pink">Lag features t-1..t-52</span>
+          <span class="chip chip-pink">Rolling mean/std</span>
+          <span class="chip chip-pink">Holiday flags</span>
+          <span class="chip chip-pink">Price index</span>
+          <span class="chip chip-pink">Seasonality decomp</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="node n-pink" data-tip="Anomaly Detection — Isolation Forest + Z-score for demand spikes/drops. Flags outliers in historical actuals before model training. Alerts sent to Notification Service via Kafka. Planner can review and override.">
+      <span class="node-icon">🔍</span>
+      <div class="node-name">Anomaly Detection</div>
+      <div class="node-sub">Isolation Forest · Z-score</div>
+      <div class="inner-card">
+        <div class="inner-title">Outputs</div>
+        <div class="inner-row">
+          <span class="chip chip-pink">Anomaly score</span>
+          <span class="chip chip-pink">Spike alert</span>
+          <span class="chip chip-pink">Outlier flag</span>
+          <span class="chip chip-pink">Confidence band</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-pink">→ Kafka alert topic</span></div>
+    </div>
+
+    <div class="node n-pink" data-tip="Model registry — tracks trained model versions per SKU+location. Stores accuracy metrics (MAPE, RMSE, MAE) per run. Serves predictions via in-memory cache. Auto-retrain triggered when MAPE degrades > 5%.">
+      <span class="node-icon">📦</span>
+      <div class="node-name">Model Registry</div>
+      <div class="node-sub">Versioning · Metrics · Retrain</div>
+      <div class="inner-card">
+        <div class="inner-title">Tracked metrics</div>
+        <div class="inner-row">
+          <span class="chip chip-pink">MAPE</span>
+          <span class="chip chip-pink">RMSE</span>
+          <span class="chip chip-pink">MAE</span>
+          <span class="chip chip-pink">Bias</span>
+          <span class="chip chip-pink">Coverage %</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-pink">Auto-retrain on MAPE &gt;5%</span></div>
+    </div>
+
+  </div>
+
+  <!-- BullMQ job queues row -->
+  <div class="row-label" style="margin-top:14px">BullMQ Job Queues (Redis-backed)</div>
+  <div class="grid-auto" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr))">
+    <div class="node n-orange" data-tip="formula-recalc queue — triggered on every cell save. Priority: CRITICAL > HIGH > NORMAL. Fan-out to cube workers. Job retries on failure with backoff. Dead-letter queue for failed jobs.">
+      <span class="node-icon">⚙️</span>
+      <div class="node-name">formula-recalc</div>
+      <div class="node-sub">Priority queue</div>
+      <div class="tags"><span class="tag t-orange">CRITICAL/HIGH/NORMAL</span></div>
+    </div>
+    <div class="node n-orange" data-tip="report-generation queue — async heavy jobs. PDF render (Puppeteer), Excel export (ExcelJS), large ClickHouse queries. Results uploaded to S3, signed URL returned to client.">
+      <span class="node-icon">📄</span>
+      <div class="node-name">report-generation</div>
+      <div class="node-sub">PDF · Excel · ClickHouse</div>
+      <div class="tags"><span class="tag t-orange">S3 result</span></div>
+    </div>
+    <div class="node n-orange" data-tip="erp-sync queue — scheduled every 15 min for ChemCorp SAP. Delta-only sync, max 50K records per run. Conflict resolution logged. Notification on completion.">
+      <span class="node-icon">🔌</span>
+      <div class="node-name">erp-sync</div>
+      <div class="node-sub">Scheduled SAP/Oracle</div>
+      <div class="tags"><span class="tag t-orange">Cron + on-demand</span></div>
+    </div>
+    <div class="node n-orange" data-tip="forecast-run queue — triggered manually or nightly cron. Sends job to Python FastAPI. Job flow: feature extraction → model run → accuracy calc → save results → notify planner.">
+      <span class="node-icon">🤖</span>
+      <div class="node-name">forecast-run</div>
+      <div class="node-sub">ML job dispatcher</div>
+      <div class="tags"><span class="tag t-pink">5–15 min jobs</span></div>
+    </div>
+    <div class="node n-orange" data-tip="notification-dispatch queue — fan-out email + WS + Slack. Rate-limited per user (max 50 emails/day). Digest grouping for low-priority alerts. Dead-letter for failed deliveries.">
+      <span class="node-icon">🔔</span>
+      <div class="node-name">notification-dispatch</div>
+      <div class="node-sub">Email · WS · Slack fan-out</div>
+      <div class="tags"><span class="tag t-blue">Rate-limited</span></div>
+    </div>
+    <div class="node n-orange" data-tip="file-import queue — Excel/CSV async processing. SheetJS parse → column map → row validate → bulk upsert batches of 1000. Progress events streamed to client via WebSocket.">
+      <span class="node-icon">📁</span>
+      <div class="node-name">file-import</div>
+      <div class="node-sub">Excel/CSV bulk processing</div>
+      <div class="tags"><span class="tag t-orange">1K row batches</span></div>
+    </div>
+  </div>
+
+  <!-- Planning lifecycle -->
+  <div class="lifecycle" style="margin-top:14px">
+    <div class="lc-title">Planning Lifecycle — End-to-End Request Flow</div>
+    <div class="lc-steps">
+      <div class="lc-step"><div class="lc-num">1</div><span class="lc-icon">✏️</span><div class="lc-name">Planner edits demand cell</div><div class="lc-time">&lt;50ms save</div></div>
+      <div class="lc-arrow">→</div>
+      <div class="lc-step"><div class="lc-num">2</div><span class="lc-icon">📨</span><div class="lc-name">Kafka: cube.cell.changed</div><div class="lc-time">async</div></div>
+      <div class="lc-arrow">→</div>
+      <div class="lc-step"><div class="lc-num">3</div><span class="lc-icon">🧮</span><div class="lc-name">Formula recalc (MRP/DRP)</div><div class="lc-time">BullMQ queue</div></div>
+      <div class="lc-arrow">→</div>
+      <div class="lc-step"><div class="lc-num">4</div><span class="lc-icon">⚡</span><div class="lc-name">WebSocket push to grid</div><div class="lc-time">&lt;1s visible</div></div>
+      <div class="lc-arrow">→</div>
+      <div class="lc-step"><div class="lc-num">5</div><span class="lc-icon">📤</span><div class="lc-name">Submit for approval</div><div class="lc-time">workflow trigger</div></div>
+      <div class="lc-arrow">→</div>
+      <div class="lc-step"><div class="lc-num">6</div><span class="lc-icon">📧</span><div class="lc-name">Email + Slack notify</div><div class="lc-time">SLA timer starts</div></div>
+      <div class="lc-arrow">→</div>
+      <div class="lc-step"><div class="lc-num">7</div><span class="lc-icon">✅</span><div class="lc-name">Manager approves</div><div class="lc-time">audit log write</div></div>
+      <div class="lc-arrow">→</div>
+      <div class="lc-step"><div class="lc-num">8</div><span class="lc-icon">🔄</span><div class="lc-name">ERP outbound sync</div><div class="lc-time">SAP push</div></div>
+    </div>
+  </div>
+
+</div><!-- /layer backend -->
+
+<!-- KAFKA EVENT BUS -->
+<div class="connector">
+  <div class="conn-moving"></div>
+  <span class="conn-label">Async Kafka events</span>
+  <div class="conn-moving"></div>
+</div>
+
+<div class="section-label">④ Event Bus — Apache Kafka</div>
+<div class="kafka-bar">
+  <div class="kparticles">
+    <div class="kp"></div><div class="kp"></div><div class="kp"></div>
+    <div class="kp"></div><div class="kp"></div><div class="kp"></div>
+  </div>
+  <div class="kafka-top">
+    <span style="font-size:1.2rem">🗂️</span>
+    <span class="kafka-title">Apache Kafka — 3-node cluster · 50K+ msg/sec · Log-based replay · Consumer groups per service</span>
+    <span class="kafka-stat">Retention: 7 days · Replication: 3 · Partitions: 12 per topic</span>
+  </div>
+  <div class="kafka-topics">
+    <span class="ktopic">tenant.{id}.cube.cell.changed</span>
+    <span class="ktopic">demand.forecast.approved</span>
+    <span class="ktopic">workflow.step.completed</span>
+    <span class="ktopic">integration.erp.synced</span>
+    <span class="ktopic">notification.dispatch</span>
+    <span class="ktopic">anomaly.detected</span>
+    <span class="ktopic">forecast.job.completed</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- LAYER 4 — DATA                                                -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="section-label">⑤ Data Layer</div>
+<div class="layer layer-data">
+  <div class="grid-auto" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
+
+    <div class="node n-orange" data-tip="PostgreSQL 16 primary — all transactional data. RLS policies: every query auto-filtered by tenant_id from JWT. JSONB columns for dynamic record data. 11 schema groups. Partitioned tables for audit_logs (monthly), planning_cells (by tenant+period). 2 read replicas.">
+      <div class="dot dot-orange"></div>
+      <span class="node-icon">🐘</span>
+      <div class="node-name">PostgreSQL 16</div>
+      <div class="node-sub">Primary transactional DB</div>
+      <div class="inner-card">
+        <div class="inner-title">Key tables</div>
+        <div class="inner-row">
+          <span class="chip chip-orange">tenants</span>
+          <span class="chip chip-orange">users</span>
+          <span class="chip chip-orange">entities (metadata)</span>
+          <span class="chip chip-orange">records (JSONB)</span>
+          <span class="chip chip-orange">planning_cells</span>
+          <span class="chip chip-orange">workflow_instances</span>
+          <span class="chip chip-orange">audit_logs</span>
+          <span class="chip chip-orange">subscriptions</span>
+        </div>
+      </div>
+      <div class="inner-card" style="margin-top:5px">
+        <div class="inner-title">RLS policies (every query)</div>
+        <div class="inner-row">
+          <span class="chip chip-orange">WHERE tenant_id = current_tenant()</span>
+          <span class="chip chip-orange">GIN indexes on JSONB</span>
+          <span class="chip chip-orange">Partitioned audit logs</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-orange">32GB · 1 primary + 2 read replicas</span></div>
+    </div>
+
+    <div class="node n-orange" data-tip="ClickHouse — columnar analytical DB. Powers all dashboard KPIs and pivot reports. Materialized views for pre-aggregated KPIs (refresh every 5 min). 100M-row queries execute in 300ms. Data replicated from PostgreSQL via Debezium CDC.">
+      <div class="dot dot-orange"></div>
+      <span class="node-icon">⚡</span>
+      <div class="node-name">ClickHouse</div>
+      <div class="node-sub">Columnar OLAP analytics</div>
+      <div class="inner-card">
+        <div class="inner-title">Table engines</div>
+        <div class="inner-row">
+          <span class="chip chip-orange">MergeTree (facts)</span>
+          <span class="chip chip-orange">ReplicatedMergeTree</span>
+          <span class="chip chip-orange">Materialized Views</span>
+          <span class="chip chip-orange">AggregatingMergeTree</span>
+        </div>
+      </div>
+      <div class="inner-card" style="margin-top:5px">
+        <div class="inner-title">Key analytics tables</div>
+        <div class="inner-row">
+          <span class="chip chip-orange">planning_facts</span>
+          <span class="chip chip-orange">kpi_snapshots</span>
+          <span class="chip chip-orange">forecast_actuals</span>
+          <span class="chip chip-orange">workflow_events</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-orange">6 nodes · 128GB ea · 300ms p99</span></div>
+    </div>
+
+    <div class="node n-orange" data-tip="Redis 7 cluster — multi-purpose: (1) TanStack Query API cache, (2) Formula result cache per scenario, (3) BullMQ job queue backend, (4) Pub/Sub for WS broadcast, (5) rate-limit counters, (6) distributed cell-edit locks. 6 nodes, 3 shards.">
+      <span class="node-icon">💾</span>
+      <div class="node-name">Redis 7 (Valkey)</div>
+      <div class="node-sub">Cache · Queue · Pub/Sub</div>
+      <div class="inner-card">
+        <div class="inner-title">Usage breakdown</div>
+        <div class="inner-row">
+          <span class="chip chip-blue">API response cache</span>
+          <span class="chip chip-blue">Formula result cache</span>
+          <span class="chip chip-orange">BullMQ queues</span>
+          <span class="chip chip-blue">WS pub/sub broker</span>
+          <span class="chip chip-purple">Rate limit counters</span>
+          <span class="chip chip-green">Distributed locks</span>
+          <span class="chip chip-green">Session store</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-orange">6-node cluster · 16GB ea</span></div>
+    </div>
+
+    <div class="node n-orange" data-tip="AWS S3 / Azure Blob — object storage for: planning snapshots (S3), Excel/PDF exports (temp signed URLs), ERP sync raw files (archive), ML model artifact files (.pkl), tenant-uploaded attachments. Lifecycle: delete exports after 7 days.">
+      <span class="node-icon">☁️</span>
+      <div class="node-name">Object Storage</div>
+      <div class="node-sub">AWS S3 / Azure Blob</div>
+      <div class="inner-card">
+        <div class="inner-title">Buckets</div>
+        <div class="inner-row">
+          <span class="chip chip-blue">planning-snapshots</span>
+          <span class="chip chip-blue">report-exports (7d TTL)</span>
+          <span class="chip chip-blue">erp-sync-archive</span>
+          <span class="chip chip-pink">ml-model-artifacts</span>
+          <span class="chip chip-blue">tenant-attachments</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-green">Signed URLs · Lifecycle</span></div>
+    </div>
+
+    <div class="node n-orange" data-tip="Debezium CDC — reads PostgreSQL WAL and streams row-level changes to Kafka. Kafka Connect sink writes to ClickHouse for near-real-time analytics sync. Latency: < 5 seconds from PG write to ClickHouse availability.">
+      <span class="node-icon">🔁</span>
+      <div class="node-name">Debezium CDC</div>
+      <div class="node-sub">PG → Kafka → ClickHouse</div>
+      <div class="inner-card">
+        <div class="inner-title">Pipeline</div>
+        <div class="inner-row">
+          <span class="chip chip-orange">PG WAL reader</span>
+          <span class="chip chip-orange">Kafka producer</span>
+          <span class="chip chip-orange">CH Kafka sink</span>
+          <span class="chip chip-orange">&lt;5s latency</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-orange">Near-real-time sync</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- LAYER 5 — EXTERNAL                                            -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="section-label">⑥ External Systems &amp; Integrations</div>
+<div class="layer layer-ext">
+  <div class="grid-auto" style="grid-template-columns:repeat(auto-fill,minmax(170px,1fr))">
+
+    <div class="node n-red" data-tip="SAP ERP via RFC/BAPI. Uses node-rfc (SAP NetWeaver RFC SDK binding). Pulls: materials master, vendor master, customer master, open purchase orders, production orders, GR/GI actuals. Scheduled every 15 min. Delta sync via RFC BAPI_GOODSMVT_GETDETAIL.">
+      <span class="node-icon">🏭</span>
+      <div class="node-name">SAP ERP</div>
+      <div class="node-sub">RFC / BAPI protocol</div>
+      <div class="inner-card">
+        <div class="inner-title">Data extracted</div>
+        <div class="inner-row">
+          <span class="chip chip-red">Materials master</span>
+          <span class="chip chip-red">Vendor master</span>
+          <span class="chip chip-red">Open POs</span>
+          <span class="chip chip-red">GR/GI actuals</span>
+          <span class="chip chip-red">Production orders</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-red">Every 15 min</span></div>
+    </div>
+
+    <div class="node n-red" data-tip="Oracle ERP via REST API (OAuth2 PKCE). Pulls inventory balances, financial actuals (GL entries), purchase requisitions. Push: approved demand plan → Oracle production schedule. Delta sync via REST ?lastModified= parameter.">
+      <span class="node-icon">🏛️</span>
+      <div class="node-name">Oracle ERP</div>
+      <div class="node-sub">REST · OAuth2 PKCE</div>
+      <div class="inner-card">
+        <div class="inner-title">Sync data</div>
+        <div class="inner-row">
+          <span class="chip chip-red">Inventory balances</span>
+          <span class="chip chip-red">GL actuals</span>
+          <span class="chip chip-red">Purchase reqs</span>
+          <span class="chip chip-red">→ Prod schedule</span>
+        </div>
+      </div>
+      <div class="tags"><span class="tag t-red">Bi-directional</span></div>
+    </div>
+
+    <div class="node n-red" data-tip="Excel/CSV import — SheetJS parses .xlsx/.csv. Column mapping UI. Row-level validation (required fields, type checks, referential integrity). Async bulk insert in 1K-row batches. Progress streamed via WebSocket. Supports 100K+ rows.">
+      <span class="node-icon">📁</span>
+      <div class="node-name">Excel / CSV</div>
+      <div class="node-sub">SheetJS · Bulk import</div>
+      <div class="tags">
+        <span class="tag t-orange">100K+ rows</span>
+        <span class="tag t-orange">WS progress</span>
+      </div>
+    </div>
+
+    <div class="node n-red" data-tip="SendGrid / AWS SES — transactional email. MJML templates compiled to HTML. Events: approval needed, forecast completed, ERP sync done, SLA breach, anomaly alert. Branded per tenant (logo, colors). Delivery webhooks tracked.">
+      <span class="node-icon">📧</span>
+      <div class="node-name">SendGrid / SES</div>
+      <div class="node-sub">Transactional email</div>
+      <div class="tags">
+        <span class="tag t-blue">MJML templates</span>
+        <span class="tag t-blue">Delivery webhooks</span>
+      </div>
+    </div>
+
+    <div class="node n-red" data-tip="Slack incoming webhooks — channel per tenant team. Messages for: approval requests (#demand-planning), anomaly alerts (#supply-chain-alerts), ERP sync failures (#integration-ops). Rich Block Kit formatting.">
+      <span class="node-icon">💬</span>
+      <div class="node-name">Slack Webhooks</div>
+      <div class="node-sub">Team notifications</div>
+      <div class="tags"><span class="tag t-purple">Block Kit</span></div>
+    </div>
+
+    <div class="node n-red" data-tip="Stripe — subscription billing. Plans: Basic $99/mo, Pro $499/mo, Enterprise custom. Usage meters: rows stored, API calls, forecast runs. Webhook events: subscription.updated, invoice.paid, payment_failed → disable tenant.">
+      <span class="node-icon">💳</span>
+      <div class="node-name">Stripe Billing</div>
+      <div class="node-sub">Subscription · Usage metering</div>
+      <div class="tags"><span class="tag t-green">Webhook sync</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- LAYER 6 — INFRA                                               -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="section-label">⑦ Infrastructure, DevOps &amp; Observability</div>
+<div class="layer layer-infra">
+  <div class="grid-auto" style="grid-template-columns:repeat(auto-fill,minmax(175px,1fr))">
+
+    <div class="node n-teal" data-tip="Kubernetes EKS/AKS. HPA for Cube Engine (5-20 replicas based on CPU). Resource quotas per namespace. PodDisruptionBudgets for zero-downtime deploys. Persistent volumes for PostgreSQL + Kafka via EBS/Azure Disk. Helm v3 charts.">
+      <div class="dot dot-green"></div>
+      <span class="node-icon">☸️</span>
+      <div class="node-name">Kubernetes (EKS/AKS)</div>
+      <div class="node-sub">Orchestration · HPA · PDB</div>
+      <div class="inner-card">
+        <div class="inner-title">Config</div>
+        <div class="inner-row">
+          <span class="chip chip-green">HPA: Cube 5-20 pods</span>
+          <span class="chip chip-green">Helm v3 charts</span>
+          <span class="chip chip-green">PodDisruptionBudget</span>
+          <span class="chip chip-green">Network policies</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="node n-teal" data-tip="GitHub Actions CI/CD. On PR merge: build Docker image → push ECR/ACR → Helm upgrade to staging. On release tag: promote to production. Blue-green deploy with instant rollback. Preview environments for feature branches.">
+      <span class="node-icon">🔧</span>
+      <div class="node-name">GitHub Actions</div>
+      <div class="node-sub">CI/CD · Blue-green deploy</div>
+      <div class="inner-card">
+        <div class="inner-title">Pipeline stages</div>
+        <div class="inner-row">
+          <span class="chip chip-green">Lint + Type check</span>
+          <span class="chip chip-green">Unit + E2E tests</span>
+          <span class="chip chip-green">Docker build</span>
+          <span class="chip chip-green">Push ECR/ACR</span>
+          <span class="chip chip-green">Helm upgrade</span>
+          <span class="chip chip-green">Smoke tests</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="node n-teal" data-tip="Prometheus + Grafana — metrics collection. Custom metrics: cube_recalc_duration_ms, kafka_consumer_lag, api_response_time_p99, formula_eval_duration. Grafana dashboards per service + tenant SLA board. AlertManager → PagerDuty oncall.">
+      <div class="dot dot-green"></div>
+      <span class="node-icon">📊</span>
+      <div class="node-name">Prometheus + Grafana</div>
+      <div class="node-sub">Metrics · Alerting</div>
+      <div class="inner-card">
+        <div class="inner-title">Key metrics</div>
+        <div class="inner-row">
+          <span class="chip chip-green">api_response_p99</span>
+          <span class="chip chip-green">cube_recalc_ms</span>
+          <span class="chip chip-green">kafka_consumer_lag</span>
+          <span class="chip chip-green">formula_eval_ms</span>
+          <span class="chip chip-green">redis_hit_rate</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="node n-teal" data-tip="Loki (log aggregation) + Jaeger (distributed tracing via OpenTelemetry). Every service emits OTEL spans. Trace: Browser → Kong → Fastify → Cube → PG with full timing. Loki: structured JSON logs, queryable in Grafana. 30-day retention.">
+      <span class="node-icon">🔍</span>
+      <div class="node-name">Loki + Jaeger (OTEL)</div>
+      <div class="node-sub">Logs · Distributed tracing</div>
+      <div class="inner-card">
+        <div class="inner-title">Trace path</div>
+        <div class="inner-row">
+          <span class="chip chip-green">Browser → Kong</span>
+          <span class="chip chip-green">→ Fastify → Cube</span>
+          <span class="chip chip-green">→ PostgreSQL</span>
+          <span class="chip chip-green">Full timing chain</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="node n-teal" data-tip="Terraform IaC — provisions: VPC, EKS cluster, RDS PostgreSQL, ElastiCache Redis, MSK Kafka, S3 buckets, ACM certs, Cloudflare DNS records. State in S3 + DynamoDB locking. Modules: networking, k8s, databases, kafka.">
+      <span class="node-icon">🏗️</span>
+      <div class="node-name">Terraform (IaC)</div>
+      <div class="node-sub">Infrastructure as code</div>
+      <div class="inner-card">
+        <div class="inner-title">Provisions</div>
+        <div class="inner-row">
+          <span class="chip chip-green">VPC + EKS</span>
+          <span class="chip chip-green">RDS PostgreSQL</span>
+          <span class="chip chip-green">ElastiCache Redis</span>
+          <span class="chip chip-green">MSK Kafka</span>
+          <span class="chip chip-green">S3 + ACM certs</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="node n-teal" data-tip="Multi-tenancy runtime — tenant isolation guaranteed at 3 layers: (1) Cloudflare subdomain routing, (2) Kong JWT/tenant_id extraction, (3) PostgreSQL RLS auto-WHERE. Feature flags via Redis per tenant. Resource quotas per tenant plan.">
+      <span class="node-icon">🏢</span>
+      <div class="node-name">Multi-Tenancy</div>
+      <div class="node-sub">3-layer isolation</div>
+      <div class="inner-card">
+        <div class="inner-title">Isolation layers</div>
+        <div class="inner-row">
+          <span class="chip chip-teal">L1: Subdomain DNS</span>
+          <span class="chip chip-teal">L2: Kong tenant_id</span>
+          <span class="chip chip-teal">L3: PG RLS auto-WHERE</span>
+          <span class="chip chip-teal">Feature flags/plan</span>
+          <span class="chip chip-teal">Resource quotas</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════ METRICS STRIP ════ -->
+<div class="section-label">Performance Targets</div>
+<div class="metrics">
+  <div class="mc"><div class="mv" style="color:var(--blue)">&lt;500ms</div><div class="ml">API Response p99</div></div>
+  <div class="mc"><div class="mv" style="color:var(--green)">&lt;1s</div><div class="ml">Grid cell update (visible)</div></div>
+  <div class="mc"><div class="mv" style="color:var(--orange)">300ms</div><div class="ml">100M-row OLAP query</div></div>
+  <div class="mc"><div class="mv" style="color:var(--orange)">50K+</div><div class="ml">Kafka msg/sec throughput</div></div>
+  <div class="mc"><div class="mv" style="color:var(--green)">78K</div><div class="ml">Fastify req/sec</div></div>
+  <div class="mc"><div class="mv" style="color:var(--pink)">5–15m</div><div class="ml">ML Forecast generation</div></div>
+  <div class="mc"><div class="mv" style="color:var(--purple)">&lt;5s</div><div class="ml">PG → ClickHouse CDC lag</div></div>
+  <div class="mc"><div class="mv" style="color:var(--teal)">99.9%</div><div class="ml">Uptime SLA (Enterprise)</div></div>
+</div>
+
+<!-- ════ LEGEND ════ -->
+<div class="legend">
+  <div class="li"><div class="ld" style="background:var(--blue)"></div>Client / Frontend</div>
+  <div class="li"><div class="ld" style="background:var(--cyan)"></div>Frontend architecture</div>
+  <div class="li"><div class="ld" style="background:var(--purple)"></div>Gateway / Auth</div>
+  <div class="li"><div class="ld" style="background:var(--green)"></div>Node.js Microservices</div>
+  <div class="li"><div class="ld" style="background:var(--pink)"></div>Python ML / Forecasting</div>
+  <div class="li"><div class="ld" style="background:var(--orange)"></div>Data / Storage / Kafka</div>
+  <div class="li"><div class="ld" style="background:var(--red)"></div>External Integrations</div>
+  <div class="li"><div class="ld" style="background:var(--teal)"></div>Infrastructure / DevOps</div>
+  <div class="li">
+    <div style="width:16px;height:2px;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:2px"></div>
+    Animated data flow
+  </div>
+</div>
+
+<p style="text-align:center;font-size:.6rem;color:var(--dim);margin-top:14px">
+  Hover any node for details &nbsp;·&nbsp; SupplyIQ by SVIQ Solutions &nbsp;·&nbsp; app.supplychain.com &nbsp;·&nbsp; 2026
+</p>
+
+</div><!-- /canvas -->
+</div><!-- /tab-arch -->
+
+<!-- ══════════ TAB 2: APPLICATION FLOW A→Z ══════════ -->
+<div id="tab-flow" class="tab-pane">
+<div class="af-canvas">
+
+<div class="af-intro">
+  <h2>SupplyIQ — Full Application Flow A→Z</h2>
+  <p>Complete walkthrough of every actor, screen, and system event from Superadmin platform setup through the monthly S&amp;OP cycle. Platform: <strong style="color:var(--blue)">SupplyIQ by SVIQ Solutions</strong> &nbsp;·&nbsp; Demo tenant: <strong style="color:var(--orange)">ChemCorp Industries</strong>. Covers 15 phases across 5 actor roles.</p>
+</div>
+
+<!-- Actor Legend -->
+<div class="actor-legend">
+  <div class="al-item"><div class="al-dot" style="background:var(--red)"></div><span style="color:var(--red)">Superadmin</span> — Platform owner</div>
+  <div class="al-item"><div class="al-dot" style="background:var(--orange)"></div><span style="color:var(--orange)">Client Admin</span> — Tenant admin</div>
+  <div class="al-item"><div class="al-dot" style="background:var(--blue)"></div><span style="color:var(--blue)">Planner</span> — Day-to-day user</div>
+  <div class="al-item"><div class="al-dot" style="background:var(--green)"></div><span style="color:var(--green)">Manager</span> — Approver/reviewer</div>
+  <div class="al-item"><div class="al-dot" style="background:var(--purple)"></div><span style="color:var(--purple)">Exec / VP</span> — Final approver</div>
+  <div class="al-item"><div class="al-dot" style="background:var(--dim)"></div><span style="color:var(--dim)">System</span> — Automated process</div>
+</div>
+
+<!-- ─── PHASE 01 ─── -->
+<div class="phase-block">
+  <div class="phase-hdr phdr-red">
+    <span class="ph-num">PHASE 01</span>
+    <span class="ph-title">Platform Setup &amp; Tenant Creation</span>
+    <span class="ph-actor ph-sa">Superadmin</span>
+  </div>
+  <div class="steps-row">
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 1.1</div>
+      <div class="fc-step-title">Superadmin Login</div>
+      <div class="fc-step-desc">Navigate to admin.supplychain.com. Enter email + password. TOTP 2FA required.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-red">JWT RS256</span><span class="step-chip sc-dim">MFA TOTP</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 1.2</div>
+      <div class="fc-step-title">Create New Tenant</div>
+      <div class="fc-step-desc">Fill tenant name "ChemCorp Industries", slug "chemcorp", region EU-West.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">POST /tenants</span><span class="step-chip sc-dim">slug → subdomain</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 1.3</div>
+      <div class="fc-step-title">Assign Plan</div>
+      <div class="fc-step-desc">Select Enterprise plan (unlimited users, ML forecasting, SAP integration, 99.9% SLA).</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">Enterprise Tier</span><span class="step-chip sc-green">Stripe product linked</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 1.4</div>
+      <div class="fc-step-title">Set Feature Flags</div>
+      <div class="fc-step-desc">Enable: ML Forecasting, SAP connector, ClickHouse OLAP, Advanced Workflow, Scenario Planning.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">Redis flag:chemcorp:*</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 1.5</div>
+      <div class="fc-step-title">Provision Infrastructure</div>
+      <div class="fc-step-desc">Kubernetes namespace "chemcorp" created. PG schema isolated via RLS. S3 bucket chemcorp-data provisioned.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-teal">k8s namespace</span><span class="step-chip sc-blue">PG RLS policy</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 1.6</div>
+      <div class="fc-step-title">Send Admin Invite</div>
+      <div class="fc-step-desc">Enter admin email admin@chemcorp.com. System sends onboarding invite via SendGrid with 48h token.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-dim">SendGrid template</span><span class="step-chip sc-orange">48h token</span></div>
+    </div>
+  </div>
+  <div class="phase-footer">
+    <div class="pf-block">
+      <div class="pf-label">System Events</div>
+      <div class="pf-val">tenant.created → Kafka · Redis flags set · PG schema created · S3 bucket provisioned</div>
+    </div>
+    <div class="pf-block">
+      <div class="pf-label">Output</div>
+      <div class="pf-val">Tenant "ChemCorp" active · subdomain chemcorp.supplychain.com ready · Admin invite sent</div>
+    </div>
+  </div>
+</div>
+
+<div class="ph-conn">↓ Admin clicks invite link</div>
+
+<!-- ─── PHASE 02 ─── -->
+<div class="phase-block">
+  <div class="phase-hdr phdr-orange">
+    <span class="ph-num">PHASE 02</span>
+    <span class="ph-title">Client Admin Registration &amp; Onboarding</span>
+    <span class="ph-actor ph-ad">Client Admin</span>
+  </div>
+  <div class="steps-row">
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 2.1</div>
+      <div class="fc-step-title">Accept Invite</div>
+      <div class="fc-step-desc">Click invite link → chemcorp.supplychain.com/register?token=xxx. Token validated, pre-filled email shown.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">GET /invite/validate</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 2.2</div>
+      <div class="fc-step-title">Set Password &amp; Profile</div>
+      <div class="fc-step-desc">Enter full name, strong password (bcrypt 12), agree to ToS. React Hook Form + Zod validation.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">bcrypt 12 rounds</span><span class="step-chip sc-dim">Zod schema</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 2.3</div>
+      <div class="fc-step-title">Email OTP Verify</div>
+      <div class="fc-step-desc">6-digit OTP sent to email. Enter code within 10 min. Account activated on success.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-green">OTP 10min TTL</span><span class="step-chip sc-blue">POST /verify-otp</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 2.4</div>
+      <div class="fc-step-title">Setup MFA</div>
+      <div class="fc-step-desc">Scan TOTP QR code (Google Authenticator / Authy). Confirm with first code. Backup codes downloaded.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">TOTP RFC 6238</span><span class="step-chip sc-dim">8 backup codes</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 2.5</div>
+      <div class="fc-step-title">Billing Setup</div>
+      <div class="fc-step-desc">Stripe Checkout for Enterprise plan ($2,500/mo). Card details → Stripe tokenized. Webhook confirms subscription active.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-green">Stripe Checkout</span><span class="step-chip sc-orange">webhook → Redis flag</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 2.6</div>
+      <div class="fc-step-title">Dashboard Unlocked</div>
+      <div class="fc-step-desc">Admin redirected to chemcorp.supplychain.com/admin. Onboarding checklist shown: 6 steps remaining.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">JWT issued</span><span class="step-chip sc-dim">Checklist 0/6</span></div>
+    </div>
+  </div>
+  <div class="phase-footer">
+    <div class="pf-block">
+      <div class="pf-label">System Events</div>
+      <div class="pf-val">user.registered · subscription.activated (Stripe webhook) · Redis sess: token issued</div>
+    </div>
+    <div class="pf-block">
+      <div class="pf-label">Output</div>
+      <div class="pf-val">Admin account active · MFA enrolled · Subscription paid · Dashboard accessible</div>
+    </div>
+  </div>
+</div>
+
+<div class="ph-conn">↓ Admin starts company configuration wizard</div>
+
+<!-- ─── PHASE 03 ─── -->
+<div class="phase-block">
+  <div class="phase-hdr phdr-orange">
+    <span class="ph-num">PHASE 03</span>
+    <span class="ph-title">Company Configuration &amp; Settings</span>
+    <span class="ph-actor ph-ad">Client Admin</span>
+  </div>
+  <div class="steps-row">
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 3.1</div>
+      <div class="fc-step-title">Company Profile</div>
+      <div class="fc-step-desc">Upload company logo, set legal name "ChemCorp Industries Ltd.", industry = Chemical Manufacturing, HQ = Mumbai.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">S3 logo upload</span><span class="step-chip sc-dim">PATCH /company</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 3.2</div>
+      <div class="fc-step-title">Timezone &amp; Locale</div>
+      <div class="fc-step-desc">Select timezone Asia/Kolkata (UTC+5:30), currency INR, date format DD/MM/YYYY, fiscal year Apr–Mar.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">UTC+5:30</span><span class="step-chip sc-dim">FY: Apr–Mar</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 3.3</div>
+      <div class="fc-step-title">Holiday Calendar</div>
+      <div class="fc-step-desc">Upload or select India public holidays. Add company-specific shutdowns. Used by forecast engine for regressor features.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-green">Prophet regressors</span><span class="step-chip sc-dim">ICS import</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 3.4</div>
+      <div class="fc-step-title">Notification Settings</div>
+      <div class="fc-step-desc">Configure email domain whitelist, Slack workspace webhook, digest frequency (daily/weekly), alert thresholds.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">Slack Block Kit</span><span class="step-chip sc-blue">SendGrid domain</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 3.5</div>
+      <div class="fc-step-title">SSO Configuration</div>
+      <div class="fc-step-desc">Optional: configure SAML 2.0 with Azure AD. Upload IdP metadata XML. Test SSO login. Set "SSO Mandatory" toggle.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">SAML 2.0</span><span class="step-chip sc-dim">Azure AD / Okta</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 3.6</div>
+      <div class="fc-step-title">Security Policies</div>
+      <div class="fc-step-desc">Set session timeout (8h), password policy, IP allowlist (office CIDRs), audit log retention (2 years).</div>
+      <div class="fc-step-detail"><span class="step-chip sc-red">IP allowlist</span><span class="step-chip sc-dim">Audit 2yr</span></div>
+    </div>
+  </div>
+  <div class="phase-footer">
+    <div class="pf-block"><div class="pf-label">System Events</div><div class="pf-val">company.configured · settings saved to PG tenants table · Redis config cache refreshed</div></div>
+    <div class="pf-block"><div class="pf-label">Output</div><div class="pf-val">Company branding live · Timezone/locale set · SSO optionally active · Security policies enforced</div></div>
+  </div>
+</div>
+
+<div class="ph-conn">↓ Admin configures subscription features</div>
+
+<!-- ─── PHASE 04 ─── -->
+<div class="phase-block">
+  <div class="phase-hdr phdr-orange">
+    <span class="ph-num">PHASE 04</span>
+    <span class="ph-title">Subscription Plans &amp; Feature Management</span>
+    <span class="ph-actor ph-ad">Client Admin</span>
+  </div>
+  <div class="steps-row">
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 4.1</div>
+      <div class="fc-step-title">View Current Plan</div>
+      <div class="fc-step-desc">Admin views Plan Dashboard: Enterprise tier, usage meters (users 3/unlimited, workspaces 1/unlimited, API calls 12K/mo).</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">GET /subscription</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 4.2</div>
+      <div class="fc-step-title">Feature Comparison</div>
+      <div class="fc-step-desc">Compare Starter / Professional / Enterprise tiers. Tooltips explain each feature (AG Grid, ClickHouse, ML, SAP).</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">Plan matrix UI</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 4.3</div>
+      <div class="fc-step-title">Manage Add-ons</div>
+      <div class="fc-step-desc">Enable extra modules: Advanced Scenario Planning (+$200/mo), White-label branding, Priority support SLA.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-green">Stripe add-on</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 4.4</div>
+      <div class="fc-step-title">Billing History</div>
+      <div class="fc-step-desc">View past invoices, download PDFs, update payment method. All via Stripe Customer Portal embedded iframe.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">Stripe portal</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 4.5</div>
+      <div class="fc-step-title">Webhook Sync</div>
+      <div class="fc-step-desc">On plan change, Stripe sends webhook → API Service → Redis feature flags updated atomically → all sessions pick up new features within 30s.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-dim">flag:chemcorp:ml=1</span></div>
+    </div>
+  </div>
+  <div class="phase-footer">
+    <div class="pf-block"><div class="pf-label">System Events</div><div class="pf-val">subscription.updated (Stripe webhook) · Redis feature flags refreshed · All tenant sessions updated</div></div>
+    <div class="pf-block"><div class="pf-label">Output</div><div class="pf-val">Plan active · Feature flags live · Billing history accessible · Add-ons enabled</div></div>
+  </div>
+</div>
+
+<div class="ph-conn">↓ Admin builds data model (entities &amp; metadata)</div>
+
+<!-- ─── PHASE 05 ─── -->
+<div class="phase-block">
+  <div class="phase-hdr phdr-orange">
+    <span class="ph-num">PHASE 05</span>
+    <span class="ph-title">Entity &amp; Metadata Schema Design</span>
+    <span class="ph-actor ph-ad">Client Admin</span>
+  </div>
+  <div class="steps-row">
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 5.1</div>
+      <div class="fc-step-title">Create Entities</div>
+      <div class="fc-step-desc">Define master data entities: Product (SKU, Name, Category, UOM, Weight), Customer (ID, Region, Tier), Location, Supplier.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">Metadata Engine</span><span class="step-chip sc-dim">JSONB stored</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 5.2</div>
+      <div class="fc-step-title">Custom Fields</div>
+      <div class="fc-step-desc">Add custom fields: Product.LeadTimeDays (integer), Product.HazmatClass (enum), Customer.CreditLimit (decimal).</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">Dynamic schema</span><span class="step-chip sc-green">Type: int/str/enum/date</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 5.3</div>
+      <div class="fc-step-title">Relationships</div>
+      <div class="fc-step-desc">Define: Product → Supplier (many-to-many), Product → Location (many-to-many), Customer → SalesRep (many-to-one).</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">FK constraints</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 5.4</div>
+      <div class="fc-step-title">Validation Rules</div>
+      <div class="fc-step-desc">Set field-level validators: LeadTimeDays must be 1–365, SKU must match pattern [A-Z]{4}-[A-Z]{2}-\d{3}, CreditLimit &gt; 0.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-red">Zod + server-side</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 5.5</div>
+      <div class="fc-step-title">Schema Published</div>
+      <div class="fc-step-desc">Click "Publish Schema". Metadata Engine writes to PG JSONB. Redis schema cache refreshed (TTL 5min). All services pick up new schema.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-dim">Redis schema:chemcorp</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 5.6</div>
+      <div class="fc-step-title">Import Master Data</div>
+      <div class="fc-step-desc">Upload Products CSV (3,200 rows), Customers CSV (480 rows). Import Service validates, deduplicates, loads into PG master tables.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">SheetJS parse</span><span class="step-chip sc-green">BullMQ: file-import</span></div>
+    </div>
+  </div>
+  <div class="phase-footer">
+    <div class="pf-block"><div class="pf-label">System Events</div><div class="pf-val">schema.published → Redis cache · master_data.imported → PG → Kafka · metadata.version++</div></div>
+    <div class="pf-block"><div class="pf-label">Output</div><div class="pf-val">3,200 Products + 480 Customers imported · Schema live · Validation rules enforced on all writes</div></div>
+  </div>
+</div>
+
+<div class="ph-conn">↓ Admin invites users and sets permissions</div>
+
+<!-- ─── PHASE 06 ─── -->
+<div class="phase-block">
+  <div class="phase-hdr phdr-orange">
+    <span class="ph-num">PHASE 06</span>
+    <span class="ph-title">User Management, RBAC &amp; Row-Level Security</span>
+    <span class="ph-actor ph-ad">Client Admin</span>
+  </div>
+  <div class="steps-row">
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 6.1</div>
+      <div class="fc-step-title">Create Roles</div>
+      <div class="fc-step-desc">Define custom roles: Planning Manager (approve + edit), Regional Planner (edit own region), Viewer (read-only), Finance Reviewer.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">RBAC engine</span><span class="step-chip sc-dim">Permission matrix</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 6.2</div>
+      <div class="fc-step-title">Invite Users</div>
+      <div class="fc-step-desc">Bulk invite via CSV: 1 Planning Manager, 12 Regional Planners (EU/APAC/US), 3 Finance Reviewers. SendGrid batch emails.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">Bulk invite CSV</span><span class="step-chip sc-green">16 emails sent</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 6.3</div>
+      <div class="fc-step-title">Assign Data Scopes</div>
+      <div class="fc-step-desc">EU Planners → Region=EU filter. APAC Planners → Region=APAC. Finance Reviewers → read-only, no Cost field.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-red">PG RLS WHERE</span><span class="step-chip sc-dim">tenant_id + region</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 6.4</div>
+      <div class="fc-step-title">Field-Level Masking</div>
+      <div class="fc-step-desc">Planners see Cost column masked as "---". Only Finance role sees actual cost values. Enforced in API response layer.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">API response mask</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 6.5</div>
+      <div class="fc-step-title">Users Accept Invites</div>
+      <div class="fc-step-desc">Users register via invite links, set passwords, enroll TOTP MFA. All 16 users onboarded within 2 days.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-green">16/16 active</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 6.6</div>
+      <div class="fc-step-title">Audit Log Active</div>
+      <div class="fc-step-desc">Every user login, data change, approval action, and admin operation logged to PG audit_events table. Immutable append-only.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-dim">PG audit_events</span><span class="step-chip sc-red">Immutable</span></div>
+    </div>
+  </div>
+  <div class="phase-footer">
+    <div class="pf-block"><div class="pf-label">System Events</div><div class="pf-val">user.invited × 16 · user.activated × 16 · rbac.policy.set → PG · RLS policies enforced</div></div>
+    <div class="pf-block"><div class="pf-label">Output</div><div class="pf-val">16 users active · RBAC roles set · RLS scoped by region · Cost field masked for planners</div></div>
+  </div>
+</div>
+
+<div class="ph-conn">↓ Admin creates planning workspace</div>
+
+<!-- ─── PHASE 07 ─── -->
+<div class="phase-block">
+  <div class="phase-hdr phdr-orange">
+    <span class="ph-num">PHASE 07</span>
+    <span class="ph-title">Workspace &amp; Planning Model Setup</span>
+    <span class="ph-actor ph-ad">Client Admin</span>
+  </div>
+  <div class="steps-row">
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 7.1</div>
+      <div class="fc-step-title">Create Workspace</div>
+      <div class="fc-step-desc">Name: "Demand Planning FY2026". Type: Demand. Select fiscal year Apr 2025–Mar 2026. Assign to Planning Manager.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">POST /workspaces</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 7.2</div>
+      <div class="fc-step-title">Define Dimensions</div>
+      <div class="fc-step-desc">Add dimensions: Product (SKU-level), Location (Warehouse), Time (Monthly buckets, 12 periods), Channel (Direct/Distributor).</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">Cube Engine config</span><span class="step-chip sc-dim">OLAP hypercube</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 7.3</div>
+      <div class="fc-step-title">Define Measures</div>
+      <div class="fc-step-desc">Measures: Demand (editable), Forecast (calculated), Actual (read-only ERP), Variance % (formula), Opening Stock.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-green">Formula Engine</span><span class="step-chip sc-blue">Editable flags</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 7.4</div>
+      <div class="fc-step-title">Hierarchy Setup</div>
+      <div class="fc-step-desc">Product hierarchy: SKU → Sub-category → Category → Division (4 levels). Location: Warehouse → Region → Country → Global.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">Rollup aggregation</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 7.5</div>
+      <div class="fc-step-title">Planning Rules</div>
+      <div class="fc-step-desc">Set: past periods locked, future 12 months editable, top-down allocation enabled, cell-level lock by approval status.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-red">Lock rules</span><span class="step-chip sc-dim">Allocation mode</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 7.6</div>
+      <div class="fc-step-title">Workspace Published</div>
+      <div class="fc-step-desc">Click Publish. Cube Engine initialises Hyperblock (Product×Location×Time). PG planning_cells table populated. Grid ready.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-teal">Cube HPA: 5 pods</span><span class="step-chip sc-green">Grid ready</span></div>
+    </div>
+  </div>
+  <div class="phase-footer">
+    <div class="pf-block"><div class="pf-label">System Events</div><div class="pf-val">workspace.created · cube.hyperblock.init → HPA scale 5 pods · planning_cells table seeded</div></div>
+    <div class="pf-block"><div class="pf-label">Output</div><div class="pf-val">Workspace "Demand Planning FY2026" live · 12×3200×4 = ~153K cells initialised · Grid accessible</div></div>
+  </div>
+</div>
+
+<div class="ph-conn">↓ Admin connects ERP system</div>
+
+<!-- ─── PHASE 08 ─── -->
+<div class="phase-block">
+  <div class="phase-hdr phdr-orange">
+    <span class="ph-num">PHASE 08</span>
+    <span class="ph-title">ERP Integration Setup (SAP)</span>
+    <span class="ph-actor ph-ad">Admin + System</span>
+  </div>
+  <div class="steps-row">
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 8.1</div>
+      <div class="fc-step-title">Add SAP Connection</div>
+      <div class="fc-step-desc">Go to Integration Hub. Select SAP ECC connector. Enter: host, system number, client, RFC user/password. Credentials encrypted (AES-256) in PG.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-red">AES-256 stored</span><span class="step-chip sc-dim">node-rfc</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 8.2</div>
+      <div class="fc-step-title">Test Connection</div>
+      <div class="fc-step-desc">Click "Test Connection". RFC PING_AND_WAIT called. Response: RFC SDK 7.5 · System ID: ECC · Status: Connected ✓</div>
+      <div class="fc-step-detail"><span class="step-chip sc-green">RFC PING_AND_WAIT</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 8.3</div>
+      <div class="fc-step-title">Field Mapping</div>
+      <div class="fc-step-desc">Map SAP → Platform: MARA.MATNR → SKU, MARA.MAKTX → ProductName, MARD.LABST → OpeningStock, EKKO data → PO.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">Drag-drop mapper</span><span class="step-chip sc-orange">Type coercion</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 8.4</div>
+      <div class="fc-step-title">Schedule Sync</div>
+      <div class="fc-step-desc">Set: Full sync daily 02:00 IST, Delta sync every 15 minutes (BAPI_MATERIAL_GETLIST with change date filter).</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">BullMQ: erp-sync</span><span class="step-chip sc-dim">Cron: */15 * * *</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 8.5</div>
+      <div class="fc-step-title">First Full Sync</div>
+      <div class="fc-step-desc">Manual trigger first sync. 12,450 materials extracted via BAPI, validated (98.2% clean), deduplicated, loaded to PG. Duration: 4m 32s.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-green">12,450 materials</span><span class="step-chip sc-dim">4m 32s</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 8.6</div>
+      <div class="fc-step-title">Sync Monitoring</div>
+      <div class="fc-step-desc">Integration dashboard shows: last sync time, records synced, error count, Kafka topic integration.erp.synced event count.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">Grafana dashboard</span><span class="step-chip sc-dim">Kafka topic</span></div>
+    </div>
+  </div>
+  <div class="phase-footer">
+    <div class="pf-block"><div class="pf-label">System Events</div><div class="pf-val">integration.erp.synced → Kafka · 12,450 PG records · BullMQ erp-sync job scheduled (*/15 min)</div></div>
+    <div class="pf-block"><div class="pf-label">Output</div><div class="pf-val">SAP live-linked · 12,450 materials synced · Actuals flowing every 15 min · Delta sync active</div></div>
+  </div>
+</div>
+
+<div class="ph-conn">↓ Planner imports historical data for forecasting</div>
+
+<!-- ─── PHASE 09 ─── -->
+<div class="phase-block">
+  <div class="phase-hdr phdr-blue">
+    <span class="ph-num">PHASE 09</span>
+    <span class="ph-title">Historical Data Import &amp; Validation</span>
+    <span class="ph-actor ph-pl">Planner</span>
+  </div>
+  <div class="steps-row">
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 9.1</div>
+      <div class="fc-step-title">Planner Login</div>
+      <div class="fc-step-desc">EU Planner logs in at chemcorp.supplychain.com. JWT issued, PG RLS auto-applied: tenant_id=chemcorp, region=EU. Only EU data visible.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">JWT + RLS</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 9.2</div>
+      <div class="fc-step-title">Upload Excel File</div>
+      <div class="fc-step-desc">Go to Integration Hub → Import. Upload historical_demand_3yr.xlsx (47,230 rows, 2022–2024). Max 50MB limit.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">SheetJS parse</span><span class="step-chip sc-dim">S3 temp upload</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 9.3</div>
+      <div class="fc-step-title">Column Mapping</div>
+      <div class="fc-step-desc">Platform auto-detects: Date → Period, ProductCode → SKU, Quantity → DemandActual, Region → Location. Confirm or adjust.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">Auto-detect UI</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 9.4</div>
+      <div class="fc-step-title">Validation Preview</div>
+      <div class="fc-step-desc">Preview shows: 47,018 valid, 212 errors (unknown SKUs, negative qty). Review error rows, decide: skip or fix.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-red">212 errors flagged</span><span class="step-chip sc-green">47,018 valid</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 9.5</div>
+      <div class="fc-step-title">Async Import</div>
+      <div class="fc-step-desc">Click "Import Valid Rows". BullMQ file-import job queued. WebSocket progress bar updates: 0% → 100% in 38 seconds.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">BullMQ: file-import</span><span class="step-chip sc-dim">WS progress</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 9.6</div>
+      <div class="fc-step-title">Data in Grid</div>
+      <div class="fc-step-desc">Import complete. 47,018 rows in PG historical_demand. Grid shows actuals in read-only columns. ClickHouse synced via CDC.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-green">Grid populated</span><span class="step-chip sc-blue">ClickHouse via CDC</span></div>
+    </div>
+  </div>
+  <div class="phase-footer">
+    <div class="pf-block"><div class="pf-label">System Events</div><div class="pf-val">file.import.completed · 47,018 rows → PG → Debezium CDC → Kafka → ClickHouse</div></div>
+    <div class="pf-block"><div class="pf-label">Output</div><div class="pf-val">3 years of history loaded · Grid shows actuals · ClickHouse OLAP ready for forecast engine</div></div>
+  </div>
+</div>
+
+<div class="ph-conn">↓ Planner runs ML forecast</div>
+
+<!-- ─── PHASE 10 ─── -->
+<div class="phase-block">
+  <div class="phase-hdr phdr-blue">
+    <span class="ph-num">PHASE 10</span>
+    <span class="ph-title">ML Forecasting &amp; Anomaly Detection</span>
+    <span class="ph-actor ph-pl">Planner</span>
+  </div>
+  <div class="steps-row">
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 10.1</div>
+      <div class="fc-step-title">Open Forecast Explorer</div>
+      <div class="fc-step-desc">Navigate to Forecast Explorer tab. Select workspace "Demand Planning FY2026", scope: EU region, all categories, 12-month horizon.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">GET /forecast/scope</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 10.2</div>
+      <div class="fc-step-title">Model Configuration</div>
+      <div class="fc-step-desc">Auto-model selection (based on series length, seasonality score). Preview: Prophet for seasonal SKUs, LightGBM for high-volatility, ARIMA for stable.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">Model Selector</span><span class="step-chip sc-pink">Feature Store</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 10.3</div>
+      <div class="fc-step-title">Add Regressors</div>
+      <div class="fc-step-desc">Enable external regressors: India holidays calendar, product price (from SAP), promotional flag. Prophet adds as additional regressors.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">Prophet regressors</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 10.4</div>
+      <div class="fc-step-title">Run Forecast Job</div>
+      <div class="fc-step-desc">Click "Run Forecast". POST /forecast/run → BullMQ forecast-run job → FastAPI service. WebSocket shows 5 stages: Feature eng → Train → Predict → Validate → Save.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-dim">BullMQ: forecast-run</span><span class="step-chip sc-pink">FastAPI Python</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 10.5</div>
+      <div class="fc-step-title">Results &amp; Accuracy</div>
+      <div class="fc-step-desc">Forecast complete in 14 min. MAPE 8.2%, RMSE 142 units. ECharts shows forecast vs actual overlay with confidence bands (80%/95%).</div>
+      <div class="fc-step-detail"><span class="step-chip sc-green">MAPE 8.2%</span><span class="step-chip sc-blue">95% CI bands</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 10.6</div>
+      <div class="fc-step-title">Anomaly Override</div>
+      <div class="fc-step-desc">Anomaly detector flags CHEM-EU-099 (z-score 3.4, likely outlier). Planner reviews, overrides 2 cells with commentary. Overrides saved separately.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-red">Isolation Forest</span><span class="step-chip sc-dim">Override log</span></div>
+    </div>
+  </div>
+  <div class="phase-footer">
+    <div class="pf-block"><div class="pf-label">System Events</div><div class="pf-val">forecast.job.completed → Kafka · anomaly.detected × 3 · forecast cells → PG · Model registry updated</div></div>
+    <div class="pf-block"><div class="pf-label">Output</div><div class="pf-val">12-month forecast ready · MAPE 8.2% · 2 anomaly overrides · Forecast seeded into planning grid</div></div>
+  </div>
+</div>
+
+<div class="ph-conn">↓ Admin designs approval workflow</div>
+
+<!-- ─── PHASE 11 ─── -->
+<div class="phase-block">
+  <div class="phase-hdr phdr-orange">
+    <span class="ph-num">PHASE 11</span>
+    <span class="ph-title">Workflow Configuration &amp; Approval Design</span>
+    <span class="ph-actor ph-ad">Client Admin</span>
+  </div>
+  <div class="steps-row">
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 11.1</div>
+      <div class="fc-step-title">Open Workflow Designer</div>
+      <div class="fc-step-desc">Go to Settings → Workflow. Click "New Workflow". Select template "Demand Planning Approval — Monthly".</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">Workflow Engine</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 11.2</div>
+      <div class="fc-step-title">Define Steps</div>
+      <div class="fc-step-desc">Step 1: Planner submits. Step 2: Regional Manager reviews (24h SLA). Step 3: VP Finance final approve (48h SLA). 3-step pipeline.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">FSM: 3 steps</span><span class="step-chip sc-red">SLA timers</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 11.3</div>
+      <div class="fc-step-title">Routing Rules</div>
+      <div class="fc-step-desc">Route by region: EU plans → EU Regional Manager. APAC plans → APAC Manager. Variance &gt;15% → auto-escalate to VP Finance.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-green">IF/THEN routing</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 11.4</div>
+      <div class="fc-step-title">Escalation Rules</div>
+      <div class="fc-step-desc">SLA breach at 80% → send reminder email. At 100% SLA → auto-escalate to next approver. Log escalation event.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-red">BullMQ: notification</span><span class="step-chip sc-dim">SLA timer</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 11.5</div>
+      <div class="fc-step-title">Notification Config</div>
+      <div class="fc-step-desc">Email + Slack Block Kit on: new task assigned, SLA warning, approval complete. Slack webhook: #supply-chain-approvals channel.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">Slack webhook</span><span class="step-chip sc-blue">SendGrid template</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 11.6</div>
+      <div class="fc-step-title">Publish Workflow</div>
+      <div class="fc-step-desc">Click Publish. Workflow Engine registers FSM definition. Status: DRAFT → PUBLISHED. Workspace "Demand Planning FY2026" linked to this workflow.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-teal">Workflow PUBLISHED</span></div>
+    </div>
+  </div>
+  <div class="phase-footer">
+    <div class="pf-block"><div class="pf-label">System Events</div><div class="pf-val">workflow.published · FSM definition stored in PG · Workspace linked · Kafka: workflow.step.completed</div></div>
+    <div class="pf-block"><div class="pf-label">Output</div><div class="pf-val">3-step approval workflow active · SLA timers configured · Escalation rules live · Slack notifications ready</div></div>
+  </div>
+</div>
+
+<div class="ph-conn">↓ Planner opens grid and starts planning</div>
+
+<!-- ─── PHASE 12 ─── -->
+<div class="phase-block">
+  <div class="phase-hdr phdr-blue">
+    <span class="ph-num">PHASE 12</span>
+    <span class="ph-title">Day-to-Day Planning — Grid Editing &amp; Submit</span>
+    <span class="ph-actor ph-pl">Planner</span>
+  </div>
+  <div class="steps-row">
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 12.1</div>
+      <div class="fc-step-title">Open Planning Grid</div>
+      <div class="fc-step-desc">Navigate to Planning → Demand Planning FY2026. AG Grid loads 2,340 SKUs × 12 periods via server-side row model. Initial load: 420ms.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">AG Grid SSRM</span><span class="step-chip sc-dim">420ms load</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 12.2</div>
+      <div class="fc-step-title">Filter &amp; Navigate</div>
+      <div class="fc-step-desc">Apply filter: Region=EU, Category=Solvents. Grid now shows 187 SKUs. Expand hierarchy to Sub-category → SKU level. Pivot by month.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">Pivot Mode</span><span class="step-chip sc-green">Virtual scroll</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 12.3</div>
+      <div class="fc-step-title">Edit Cell Value</div>
+      <div class="fc-step-desc">Click CHEM-EU-001 Jan demand cell. Change 850 → 1,100. Tab to next cell. Cell turns blue (pending). Formula bar shows formula if any.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">Pending state</span><span class="step-chip sc-dim">Formula bar</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 12.4</div>
+      <div class="fc-step-title">Real-time Recalc</div>
+      <div class="fc-step-desc">PATCH /cells → Kafka cell.changed → Formula Engine recalculates 47 dependent cells (MRP, safety stock, total). WS pushes updated values &lt;1s.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-green">&lt;1s WS push</span><span class="step-chip sc-purple">47 cells updated</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 12.5</div>
+      <div class="fc-step-title">Add Commentary</div>
+      <div class="fc-step-desc">Right-click cell → "Add Note". Type "Q1 promotional campaign +30% uplift from Marketing". Note saved, visible to all approvers in review.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">Cell commentary</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 12.6</div>
+      <div class="fc-step-title">Review KPI Dashboard</div>
+      <div class="fc-step-desc">Analytics tab: Demand vs Forecast variance chart. Identify CHEM-EU-017 under-forecasted by 22%. Adjust 3 more cells. Total EU demand +8.4%.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">ECharts variance</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 12.7</div>
+      <div class="fc-step-title">Submit for Approval</div>
+      <div class="fc-step-desc">Click "Submit Plan". Modal shows summary: 34 cells changed, 3 notes added. Confirm → Workflow FSM transitions DRAFT → SUBMITTED.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-green">FSM: SUBMITTED</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 12.8</div>
+      <div class="fc-step-title">Notifications Sent</div>
+      <div class="fc-step-desc">Workflow Engine: email + Slack to EU Regional Manager "New plan submitted for review". SLA 24h timer starts. Planning cells locked for editing.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">Cells locked</span><span class="step-chip sc-blue">SLA 24h started</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 12.9</div>
+      <div class="fc-step-title">Bulk Edit &amp; Multi-Cell Paste</div>
+      <div class="fc-step-desc">Select range B4:B16 (12 months for one SKU). Paste Excel-copied values — SheetJS clipboard parse. Or apply formula: "=FORECAST × 1.1" to entire selection. 12 cells updated in one action.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">Range select</span><span class="step-chip sc-blue">Clipboard paste</span><span class="step-chip sc-green">Bulk formula</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 12.10</div>
+      <div class="fc-step-title">Plan Version Snapshot</div>
+      <div class="fc-step-desc">Before submitting, create a named snapshot: "EU-Jan-2026-v1". System saves copy-on-write version to PG plan_versions table. Planner can revert to any snapshot within 90 days.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">Copy-on-write</span><span class="step-chip sc-dim">90d retention</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 12.11</div>
+      <div class="fc-step-title">Offline Excel Export</div>
+      <div class="fc-step-desc">Export current grid view to Excel (.xlsx). ExcelJS renders filtered 187-SKU × 12-month view with formulas intact. Planner reviews offline, makes notes, re-imports delta changes.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-green">ExcelJS export</span><span class="step-chip sc-blue">Delta re-import</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 12.12</div>
+      <div class="fc-step-title">Collaboration: Add @Mention</div>
+      <div class="fc-step-desc">In cell comment, planner types "@planning-manager" — autocomplete from user list. Tagged user gets in-app bell notification + email. Comment thread now visible in review screen for approver.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">@mention notify</span><span class="step-chip sc-dim">WS push</span></div>
+    </div>
+  </div>
+  <div class="phase-footer">
+    <div class="pf-block"><div class="pf-label">System Events</div><div class="pf-val">cell.changed × 34 → Kafka → Formula Engine → WS push · plan_version.created · workflow.submitted · notification.dispatch × 3</div></div>
+    <div class="pf-block"><div class="pf-label">Output</div><div class="pf-val">34 cells updated · Version snapshot saved · Plan in review · Cells locked · Manager notified email + Slack + in-app</div></div>
+  </div>
+</div>
+
+<div class="ph-conn">↓ Manager receives notification and reviews plan</div>
+
+<!-- ─── PHASE 13 ─── -->
+<div class="phase-block">
+  <div class="phase-hdr phdr-green">
+    <span class="ph-num">PHASE 13</span>
+    <span class="ph-title">Approval Process — Review, Approve &amp; ERP Sync</span>
+    <span class="ph-actor ph-mg">Manager + VP Exec</span>
+  </div>
+  <div class="steps-row">
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 13.1</div>
+      <div class="fc-step-title">Manager Login</div>
+      <div class="fc-step-desc">EU Regional Manager opens email link → My Tasks page. Sees "EU Demand Plan - Jan 2026" with 24h SLA countdown (22h remaining).</div>
+      <div class="fc-step-detail"><span class="step-chip sc-green">Task inbox</span><span class="step-chip sc-red">SLA 22h left</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 13.2</div>
+      <div class="fc-step-title">Review Diff View</div>
+      <div class="fc-step-desc">Click plan → Review screen. Side-by-side diff: old value vs new value for all 34 changed cells. Cells highlighted red (decrease) or green (increase).</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">Diff UI</span><span class="step-chip sc-dim">34 cells shown</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 13.3</div>
+      <div class="fc-step-title">Read Commentary</div>
+      <div class="fc-step-desc">Manager reads planner notes (Q1 promo campaign note). Checks ECharts variance chart. CHEM-EU-001 increase justified. 30 cells approved.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">Commentary visible</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 13.4</div>
+      <div class="fc-step-title">Request Changes</div>
+      <div class="fc-step-desc">4 cells flagged for revision (excessive uplift, no justification). Manager adds comment: "Provide basis for CHEM-EU-033 +45% change." Plan → IN_REVISION.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-red">FSM: IN_REVISION</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 13.5</div>
+      <div class="fc-step-title">Planner Revises</div>
+      <div class="fc-step-desc">Planner gets notified, updates 4 cells with revised values and commentary. Re-submits → SUBMITTED again. Manager approves all in 2nd review.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">Re-submit cycle</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 13.6</div>
+      <div class="fc-step-title">VP Finance Approval</div>
+      <div class="fc-step-desc">Plan escalated to VP Finance (variance &gt;15% overall). VP reviews summary KPIs, approves. FSM: APPROVED. Audit log entry created.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">FSM: APPROVED</span><span class="step-chip sc-dim">Audit logged</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 13.7</div>
+      <div class="fc-step-title">Cells Frozen</div>
+      <div class="fc-step-desc">On APPROVED status: planning cells write-locked at DB level. No further edits allowed without new workflow cycle. Cells show gold lock icon.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">DB write-lock</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 13.8</div>
+      <div class="fc-step-title">ERP Sync Triggered</div>
+      <div class="fc-step-desc">On approval: demand.forecast.approved → Kafka → Integration Service → BullMQ erp-sync → SAP BAPI_SALESORDER_CREATEFROMDAT2. 847 plan records pushed to SAP in 1m 12s.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-green">→ SAP BAPI</span><span class="step-chip sc-dim">847 records · 1m12s</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 13.9</div>
+      <div class="fc-step-title">Partial Line-Item Approval</div>
+      <div class="fc-step-desc">Manager can approve specific SKU rows and send others for revision independently. FSM supports line-item status: APPROVED / REVISION_NEEDED / PENDING. Granular control per product-location.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">Line-item FSM</span><span class="step-chip sc-blue">Row-level status</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 13.10</div>
+      <div class="fc-step-title">Approval Analytics</div>
+      <div class="fc-step-desc">Admin dashboard: avg approval cycle time 3.2 days, SLA compliance 94%, top bottleneck: VP Finance step (avg 1.8 days). Identify slow approvers, send reminders proactively.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">Cycle analytics</span><span class="step-chip sc-red">Bottleneck detect</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 13.11</div>
+      <div class="fc-step-title">Rejection &amp; Rework Cycle</div>
+      <div class="fc-step-desc">If plan rejected: cells unlocked for planner. Rejection reason stored with version diff. Planner amends, re-submits → workflow restarts from Step 1. Full history retained per cycle.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-red">FSM: REJECTED</span><span class="step-chip sc-dim">Rework log</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 13.12</div>
+      <div class="fc-step-title">Approval Completion Broadcast</div>
+      <div class="fc-step-desc">On final APPROVED: notification.dispatch → Kafka → email to all stakeholders (planners, managers, finance), Slack Block Kit message in #supply-chain-approvals with plan summary card.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">Kafka broadcast</span><span class="step-chip sc-purple">Slack Block Kit</span></div>
+    </div>
+  </div>
+  <div class="phase-footer">
+    <div class="pf-block"><div class="pf-label">System Events</div><div class="pf-val">workflow.step.completed × 3 · demand.forecast.approved → Kafka · 847 records → SAP · audit_events logged · notification.dispatch × 12</div></div>
+    <div class="pf-block"><div class="pf-label">Output</div><div class="pf-val">Plan APPROVED · Cells frozen · SAP demand plan updated · Full audit trail in PG · All stakeholders notified email + Slack</div></div>
+  </div>
+</div>
+
+<div class="ph-conn">↓ Manager generates reports and shares with stakeholders</div>
+
+<!-- ─── PHASE 14 ─── -->
+<div class="phase-block">
+  <div class="phase-hdr phdr-green">
+    <span class="ph-num">PHASE 14</span>
+    <span class="ph-title">Reporting, Analytics &amp; Export</span>
+    <span class="ph-actor ph-mg">Manager</span>
+  </div>
+  <div class="steps-row">
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 14.1</div>
+      <div class="fc-step-title">Open Report Builder</div>
+      <div class="fc-step-desc">Navigate to Reports → New Report. Drag dimensions: Product Category, Month. Drag measures: Demand, Forecast, Variance%, Actual.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">Drag-drop builder</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 14.2</div>
+      <div class="fc-step-title">Apply Filters</div>
+      <div class="fc-step-desc">Filter: FY2026, EU region, Approved plans only. Report Engine builds SQL → ClickHouse query executes in 287ms for 100M+ rows.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">ClickHouse 287ms</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 14.3</div>
+      <div class="fc-step-title">Pivot &amp; Visualise</div>
+      <div class="fc-step-desc">Pivot table: Category × Month × Demand. ECharts waterfall chart for variance. Heatmap for SKU-level under/over performance.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">ECharts pivot</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 14.4</div>
+      <div class="fc-step-title">Schedule Report</div>
+      <div class="fc-step-desc">Click "Schedule". Set: Every Monday 08:00 IST, email to VP Finance + CEO, attach Excel + PDF. BullMQ report-generation job registered.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-dim">BullMQ: report-gen</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 14.5</div>
+      <div class="fc-step-title">Download Excel</div>
+      <div class="fc-step-desc">Click Download Excel. ExcelJS generates 4-sheet workbook (Summary, Demand Detail, Variance Analysis, Forecast Accuracy). 347KB in 2.3s.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-green">ExcelJS 4 sheets</span><span class="step-chip sc-dim">347KB / 2.3s</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 14.6</div>
+      <div class="fc-step-title">Dashboard KPIs</div>
+      <div class="fc-step-desc">Analytics Dashboard: OTIF 94.2%, Forecast Accuracy 91.8%, Inventory Turnover 8.4×, Plan Cycle Time 3.2 days. Auto-refresh every 30s via WebSocket.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">OTIF 94.2%</span><span class="step-chip sc-green">Accuracy 91.8%</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 14.7</div>
+      <div class="fc-step-title">PDF Board Pack</div>
+      <div class="fc-step-desc">Generate executive PDF: Puppeteer renders report in headless Chrome, injects ECharts as SVG. 12-page board pack with cover, executive summary, category breakdown. Generated in 8.4s, stored S3.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">Puppeteer PDF</span><span class="step-chip sc-dim">S3: reports/</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 14.8</div>
+      <div class="fc-step-title">BI Tool Integration</div>
+      <div class="fc-step-desc">Connect Power BI or Tableau via SupplyIQ REST API (GET /reports/data?format=json). OAuth2 scoped token. Data refreshes in Power BI every 30min via scheduled refresh. Real-time data for executives.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">Power BI connect</span><span class="step-chip sc-blue">OAuth2 token</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 14.9</div>
+      <div class="fc-step-title">Comparative Period Analysis</div>
+      <div class="fc-step-desc">YoY comparison: FY2026 vs FY2025. ClickHouse window functions compute period-over-period delta. ECharts overlay chart shows growth trend. CAGR 14.2% demand growth identified for Solvents category.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-teal">ClickHouse YoY</span><span class="step-chip sc-green">CAGR 14.2%</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 14.10</div>
+      <div class="fc-step-title">Custom Widget Builder</div>
+      <div class="fc-step-desc">Admin creates custom dashboard widget: drag KPIs, select chart type, set refresh rate, assign to role (Planner/Manager/Exec). Widgets persisted per user role in PG dashboard_config JSONB.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">JSONB config</span><span class="step-chip sc-dim">Role-scoped</span></div>
+    </div>
+  </div>
+  <div class="phase-footer">
+    <div class="pf-block"><div class="pf-label">System Events</div><div class="pf-val">ClickHouse query → pivot → ExcelJS → S3 · Puppeteer PDF → S3 · BullMQ: report-generation scheduled · Power BI OAuth token issued</div></div>
+    <div class="pf-block"><div class="pf-label">Output</div><div class="pf-val">Excel 347KB + PDF 12-page ready · Weekly email scheduled · Power BI connected · Custom dashboards per role</div></div>
+  </div>
+</div>
+
+<div class="ph-conn">↓ Monthly S&amp;OP cycle begins</div>
+
+<!-- ─── PHASE 15 ─── -->
+<div class="phase-block">
+  <div class="phase-hdr phdr-teal">
+    <span class="ph-num">PHASE 15</span>
+    <span class="ph-title">Monthly S&amp;OP Cycle — Demand → Supply → Pre-S&amp;OP → Executive</span>
+    <span class="ph-actor ph-ex" style="background:rgba(57,211,83,.18);color:var(--teal)">All Roles</span>
+  </div>
+  <div class="socp-grid">
+    <div class="socp-week">
+      <div class="socp-wnum">WEEK 1</div>
+      <div class="socp-wtitle" style="color:var(--blue)">Demand Review</div>
+      <div class="socp-items">
+        <div class="socp-item">Planners update demand forecasts in grid</div>
+        <div class="socp-item">ML re-runs forecast job (14 min)</div>
+        <div class="socp-item">Anomaly alerts reviewed, overrides applied</div>
+        <div class="socp-item">Historical actuals vs forecast accuracy checked</div>
+        <div class="socp-item">Demand consensus meeting (ECharts shared screen)</div>
+        <div class="socp-item">Demand plan submitted for approval (FSM)</div>
+        <div class="socp-item">Regional Managers approve within 24h SLA</div>
+      </div>
+    </div>
+    <div class="socp-week">
+      <div class="socp-wnum">WEEK 2</div>
+      <div class="socp-wtitle" style="color:var(--orange)">Supply Review</div>
+      <div class="socp-items">
+        <div class="socp-item">SAP sync brings latest inventory levels</div>
+        <div class="socp-item">MRP() formula recalculates across 3,200 SKUs</div>
+        <div class="socp-item">DRP() allocates across warehouses</div>
+        <div class="socp-item">SAFETY_STOCK() updated with new demand signal</div>
+        <div class="socp-item">Capacity constraints checked vs production plan</div>
+        <div class="socp-item">Supply gaps flagged (red cells in grid)</div>
+        <div class="socp-item">Supply plan submitted → approved by Supply Chain VP</div>
+      </div>
+    </div>
+    <div class="socp-week">
+      <div class="socp-wnum">WEEK 3</div>
+      <div class="socp-wtitle" style="color:var(--purple)">Pre-S&amp;OP</div>
+      <div class="socp-items">
+        <div class="socp-item">Scenario Planning: Base / Optimistic / Conservative</div>
+        <div class="socp-item">3 scenarios forked (copy-on-write isolation)</div>
+        <div class="socp-item">Finance adjusts for price changes, FX exposure</div>
+        <div class="socp-item">KPI comparison across scenarios in ECharts</div>
+        <div class="socp-item">Recommended scenario selected by Planning Manager</div>
+        <div class="socp-item">Pre-S&OP report generated (Excel + PDF)</div>
+        <div class="socp-item">Stakeholder review pack emailed automatically</div>
+      </div>
+    </div>
+    <div class="socp-week">
+      <div class="socp-wnum">WEEK 4</div>
+      <div class="socp-wtitle" style="color:var(--teal)">Executive S&amp;OP</div>
+      <div class="socp-items">
+        <div class="socp-item">VP Finance &amp; CEO review executive dashboard</div>
+        <div class="socp-item">Final scenario approved by C-suite (VP workflow step)</div>
+        <div class="socp-item">Plan frozen: DB write-lock applied to all cells</div>
+        <div class="socp-item">demand.forecast.approved → Kafka event fired</div>
+        <div class="socp-item">Full plan pushed to SAP (847 records)</div>
+        <div class="socp-item">Monthly performance report auto-sent to distribution list</div>
+        <div class="socp-item">Next cycle opened → Planners notified via Slack</div>
+      </div>
+    </div>
+  </div>
+  <div class="phase-footer">
+    <div class="pf-block"><div class="pf-label">System Events</div><div class="pf-val">forecast.job × 2 · workflow.completed · plan.frozen · integration.erp.synced (847) · report.dispatched</div></div>
+    <div class="pf-block"><div class="pf-label">Monthly Output</div><div class="pf-val">Consensus demand plan locked · SAP updated · Reports distributed · Next cycle initiated automatically</div></div>
+    <div class="pf-block"><div class="pf-label">Cycle Time</div><div class="pf-val">Target 4 weeks · Actual avg 3.2 days for approval cycle · Fully auditable end-to-end</div></div>
+  </div>
+</div>
+
+<div class="ph-conn">↓ Planner creates what-if scenario branches</div>
+
+<!-- ─── PHASE 16 ─── -->
+<div class="phase-block">
+  <div class="phase-hdr phdr-purple">
+    <span class="ph-num">PHASE 16</span>
+    <span class="ph-title">Scenario Planning &amp; What-If Analysis</span>
+    <span class="ph-actor ph-pl">Planner + Manager</span>
+  </div>
+  <div class="steps-row">
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 16.1</div>
+      <div class="fc-step-title">Create Scenario Branch</div>
+      <div class="fc-step-desc">Open Scenario Planning page. Click "Fork Plan". Select base: "EU Demand Plan Jan 2026 — APPROVED". System creates copy-on-write branch in 2.1s. Original plan unchanged.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">Copy-on-write</span><span class="step-chip sc-dim">2.1s fork</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 16.2</div>
+      <div class="fc-step-title">Name &amp; Tag Scenario</div>
+      <div class="fc-step-desc">Create 3 scenarios: "Base Case" (0% change), "Optimistic +15%" (Q1 promo success), "Stress Test -20%" (raw material shortage). Tag with color, description, owner.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">Base</span><span class="step-chip sc-green">Optimistic</span><span class="step-chip sc-red">Stress Test</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 16.3</div>
+      <div class="fc-step-title">Apply Bulk Assumptions</div>
+      <div class="fc-step-desc">Optimistic scenario: select Solvents category → apply +15% across all 12 months. Stress Test: apply -20% to EU region, +5% raw material cost increase formula. Formula Engine recalculates all dependent cells.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">Bulk % apply</span><span class="step-chip sc-green">Formula recalc</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 16.4</div>
+      <div class="fc-step-title">MRP/DRP Impact Recalc</div>
+      <div class="fc-step-desc">Each scenario independently triggers MRP() and DRP() recalculation. Cube Engine runs parallel Hyperblock computations per scenario (isolated namespaces). Safety stock, reorder points updated in each branch.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-teal">Parallel Cube HPA</span><span class="step-chip sc-blue">Isolated namespaces</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 16.5</div>
+      <div class="fc-step-title">Side-by-Side Comparison</div>
+      <div class="fc-step-desc">Comparison view: 4 columns (Base / Optimistic / Stress / Approved). ECharts grouped bar per month. Delta heatmap highlights cells where scenarios diverge &gt;10%. Variance summary table per category.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">4-way compare</span><span class="step-chip sc-blue">Delta heatmap</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 16.6</div>
+      <div class="fc-step-title">Financial Impact KPIs</div>
+      <div class="fc-step-desc">System computes financial impact per scenario: Optimistic = +₹4.2Cr revenue, +₹1.1Cr inventory cost. Stress Test = -₹6.8Cr revenue, -₹0.9Cr cost. Management can see P&amp;L impact before decision.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-green">P&amp;L impact</span><span class="step-chip sc-orange">₹ per scenario</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 16.7</div>
+      <div class="fc-step-title">Share Read-Only Link</div>
+      <div class="fc-step-desc">Manager clicks "Share Scenario Pack". Generates time-limited read-only URL (JWT, 7d TTL). VP Finance opens link without login — sees all 3 scenarios in view-only mode. No data modification possible.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-dim">JWT 7d link</span><span class="step-chip sc-red">Read-only</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 16.8</div>
+      <div class="fc-step-title">Promote Winning Scenario</div>
+      <div class="fc-step-desc">After exec decision: "Promote Optimistic to Main Plan". System merges branch changes into main, triggers new approval workflow. Old scenarios archived with full history. Audit log records promotion event.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-green">Merge → main</span><span class="step-chip sc-dim">Archive old</span></div>
+    </div>
+  </div>
+  <div class="phase-footer">
+    <div class="pf-block"><div class="pf-label">System Events</div><div class="pf-val">scenario.created × 3 · cube.recalc × 3 (parallel) · scenario.shared · scenario.promoted → new workflow</div></div>
+    <div class="pf-block"><div class="pf-label">Output</div><div class="pf-val">3 scenarios live · Financial impact quantified · Exec reviewed via link · Winning scenario promoted · Archived history</div></div>
+  </div>
+</div>
+
+<div class="ph-conn">↓ Team collaboration and communication</div>
+
+<!-- ─── PHASE 17 ─── -->
+<div class="phase-block">
+  <div class="phase-hdr phdr-blue">
+    <span class="ph-num">PHASE 17</span>
+    <span class="ph-title">Collaboration, Comments, @Mentions &amp; Activity Feed</span>
+    <span class="ph-actor ph-pl">Planner + Manager + All Roles</span>
+  </div>
+  <div class="steps-row">
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 17.1</div>
+      <div class="fc-step-title">Cell-Level Comments</div>
+      <div class="fc-step-desc">Right-click any grid cell → "Add Comment". Rich text comment box opens. Planner types context for unusual values. Comment saved in PG cell_comments table with user, timestamp, cell address (SKU+Period).</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">Cell-level comment</span><span class="step-chip sc-dim">PG cell_comments</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 17.2</div>
+      <div class="fc-step-title">@Mention &amp; Tagging</div>
+      <div class="fc-step-desc">In comment, type "@" → dropdown shows team members filtered by workspace access. Tag @planning-manager. System fires notification.dispatch → Kafka → email + in-app bell notification to tagged user within 500ms.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">@mention</span><span class="step-chip sc-green">500ms notify</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 17.3</div>
+      <div class="fc-step-title">Threaded Replies</div>
+      <div class="fc-step-desc">Manager replies to planner's comment inline. Thread depth up to 5 levels. Replies show user avatar, role badge, timestamp. Resolved threads collapsed. Open threads shown as amber dot on cell.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">Thread depth 5</span><span class="step-chip sc-dim">Cell dot indicator</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 17.4</div>
+      <div class="fc-step-title">Activity Feed</div>
+      <div class="fc-step-desc">Workspace Activity panel (right sidebar): real-time stream of all events — cell edits, comments, submissions, approvals, scenario forks. Powered by WebSocket subscription to workspace channel. Filterable by type/user.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-teal">WS real-time</span><span class="step-chip sc-blue">Workspace channel</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 17.5</div>
+      <div class="fc-step-title">Document Attachments</div>
+      <div class="fc-step-desc">Attach supporting files to any planning period or SKU: market research PDFs, pricing sheets, demand survey results. Max 10MB per file. S3 stored. Attachment count shown as paperclip icon on cell.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">S3 attachments</span><span class="step-chip sc-dim">10MB limit</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 17.6</div>
+      <div class="fc-step-title">Collaborative Edit Lock</div>
+      <div class="fc-step-desc">When Planner A opens a row for editing, a "presence lock" is set in Redis (lock:cell:{id} TTL 30s, refreshed on activity). Planner B sees row highlighted yellow with "Editing: Priya" — cannot edit simultaneously.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-red">Redis lock:cell</span><span class="step-chip sc-dim">TTL 30s</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 17.7</div>
+      <div class="fc-step-title">Daily Activity Digest</div>
+      <div class="fc-step-desc">System sends daily email digest at 08:00 to each user: X cells changed in your workspace, Y comments awaiting reply, Z approvals pending. BullMQ digest job runs nightly. User can configure/unsubscribe.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">BullMQ digest</span><span class="step-chip sc-dim">08:00 daily</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 17.8</div>
+      <div class="fc-step-title">Comment Resolution &amp; Export</div>
+      <div class="fc-step-desc">Manager marks comments "Resolved" after planner addresses them. Resolved comments archived but auditable. Export all comments for a plan cycle as CSV for compliance review. Full comment history immutable.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-green">Resolved state</span><span class="step-chip sc-dim">CSV export</span></div>
+    </div>
+  </div>
+  <div class="phase-footer">
+    <div class="pf-block"><div class="pf-label">System Events</div><div class="pf-val">comment.created → PG + WS push · @mention → notification.dispatch → Kafka · cell.lock.acquired (Redis)</div></div>
+    <div class="pf-block"><div class="pf-label">Output</div><div class="pf-val">Full comment threads · @mention notifications · Real-time presence locking · Activity feed live · Daily digests</div></div>
+  </div>
+</div>
+
+<div class="ph-conn">↓ Admin sets up alerts and KPI thresholds</div>
+
+<!-- ─── PHASE 18 ─── -->
+<div class="phase-block">
+  <div class="phase-hdr phdr-orange">
+    <span class="ph-num">PHASE 18</span>
+    <span class="ph-title">Alerts, KPI Thresholds &amp; Real-Time Monitoring</span>
+    <span class="ph-actor ph-ad">Admin + Manager</span>
+  </div>
+  <div class="steps-row">
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 18.1</div>
+      <div class="fc-step-title">Define KPI Thresholds</div>
+      <div class="fc-step-desc">Admin opens Settings → Alerts. Create rule: "OTIF Alert" — IF OTIF &lt; 90% THEN alert severity=HIGH. "Forecast Accuracy" — IF MAPE &gt; 15% THEN alert severity=MEDIUM. Conditions support AND/OR logic.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-red">Threshold rules</span><span class="step-chip sc-orange">AND/OR logic</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 18.2</div>
+      <div class="fc-step-title">Anomaly Threshold Alerts</div>
+      <div class="fc-step-desc">Ongoing Isolation Forest model runs every hour on actuals vs forecast. Z-score &gt; 2.5 = anomaly. System fires anomaly.detected → Kafka → Notification Service. Planner sees amber banner: "3 anomalies in EU Solvents".</div>
+      <div class="fc-step-detail"><span class="step-chip sc-red">Isolation Forest</span><span class="step-chip sc-dim">Hourly scan</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 18.3</div>
+      <div class="fc-step-title">Real-time Alert Engine</div>
+      <div class="fc-step-desc">Alert evaluation: Kafka stream processor consumes planning events, evaluates threshold rules in-memory using rule engine (jsonata). Matching rules push to notification.dispatch topic within 200ms of trigger event.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-teal">Kafka stream</span><span class="step-chip sc-blue">200ms latency</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 18.4</div>
+      <div class="fc-step-title">Alert Delivery Channels</div>
+      <div class="fc-step-desc">HIGH severity: in-app bell (red badge) + email (immediate) + Slack Block Kit with action buttons (Acknowledge / Snooze / View). MEDIUM: in-app + daily digest. LOW: weekly digest only. Configurable per role.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">Slack buttons</span><span class="step-chip sc-blue">3 severity levels</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 18.5</div>
+      <div class="fc-step-title">SLA Breach Monitoring</div>
+      <div class="fc-step-desc">Workflow SLA timers monitored by BullMQ delayed job. At 80% SLA consumed: send reminder. At 100%: auto-escalate + fire sla.breach event → Kafka → alert. Escalation chain: Approver → Manager → Admin.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-red">SLA breach auto-escalate</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 18.6</div>
+      <div class="fc-step-title">Acknowledge &amp; Snooze</div>
+      <div class="fc-step-desc">User clicks "Acknowledge" in Slack or in-app: alert marked ACK in PG alerts table, removed from active feed. "Snooze 4h": alert re-fires at scheduled time. If unacknowledged after 24h, escalates to Manager.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-green">ACK state</span><span class="step-chip sc-dim">Snooze 4h/24h</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 18.7</div>
+      <div class="fc-step-title">Alert History &amp; Trends</div>
+      <div class="fc-step-desc">Alerts dashboard: 30-day history chart, most-fired rules, avg resolution time, top unresolved items. Identify recurring patterns: OTIF breach every 3rd week = systemic issue. Export to Excel for root-cause analysis.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">30-day history</span><span class="step-chip sc-blue">Pattern detect</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 18.8</div>
+      <div class="fc-step-title">Inventory Stockout Alerts</div>
+      <div class="fc-step-desc">Auto-calculated: IF projected_stock &lt; safety_stock THEN stockout.risk alert. Forecast engine flags 8 SKUs at risk for March 2026. Planner reviews, adjusts orders. Alert resolved when coverage improves &gt; 7 days.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-red">Stockout risk</span><span class="step-chip sc-dim">8 SKUs flagged</span></div>
+    </div>
+  </div>
+  <div class="phase-footer">
+    <div class="pf-block"><div class="pf-label">System Events</div><div class="pf-val">anomaly.detected × 3 · sla.breach × 1 · alert.fired → Kafka · notification.dispatch → email + Slack + in-app</div></div>
+    <div class="pf-block"><div class="pf-label">Output</div><div class="pf-val">Threshold rules active · Anomaly alerts live · SLA auto-escalation configured · 30-day alert history visible</div></div>
+  </div>
+</div>
+
+<div class="ph-conn">↓ Admin reviews audit trail and compliance</div>
+
+<!-- ─── PHASE 19 ─── -->
+<div class="phase-block">
+  <div class="phase-hdr phdr-red">
+    <span class="ph-num">PHASE 19</span>
+    <span class="ph-title">Audit Trail, Compliance &amp; Data Governance</span>
+    <span class="ph-actor ph-ad">Admin + Superadmin</span>
+  </div>
+  <div class="steps-row">
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 19.1</div>
+      <div class="fc-step-title">Audit Log Explorer</div>
+      <div class="fc-step-desc">Admin navigates to Settings → Audit Log. Full searchable log: filter by user, action type (CELL_EDIT, WORKFLOW_STEP, LOGIN, SCHEMA_CHANGE, EXPORT), date range, entity. Results from ClickHouse (fast for large volumes).</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">ClickHouse query</span><span class="step-chip sc-dim">Filterable</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 19.2</div>
+      <div class="fc-step-title">Cell Change History</div>
+      <div class="fc-step-desc">Click any grid cell → "View History". Timeline shows: who changed it, when, old value → new value, which approval cycle, which workflow step. Diff view with colour coding. Immutable append-only in PG cell_history.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">Timeline view</span><span class="step-chip sc-red">Immutable log</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 19.3</div>
+      <div class="fc-step-title">User Access Log</div>
+      <div class="fc-step-desc">Every login, failed login, permission change, role assignment logged. SOC 2 Type II requirement: admin can see: last login IP/device, login frequency, failed attempts, permission escalation events.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-red">SOC 2 Type II</span><span class="step-chip sc-dim">IP + device</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 19.4</div>
+      <div class="fc-step-title">Compliance Report Export</div>
+      <div class="fc-step-desc">Generate compliance report for external auditors: Excel with audit_events (180 days). Includes: all data modifications, who approved what, export events (who downloaded what data and when). Auto-signed with platform timestamp.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">180-day export</span><span class="step-chip sc-purple">Signed timestamp</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 19.5</div>
+      <div class="fc-step-title">GDPR Data Subject Request</div>
+      <div class="fc-step-desc">User requests data download (GDPR Art. 20). Admin triggers "Export User Data": collects all PG rows for user across all tables. Zip file with JSON exports ready within 72h. Sent to verified email. Deletion workflow supported.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-red">GDPR Art. 20</span><span class="step-chip sc-dim">72h SLA</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 19.6</div>
+      <div class="fc-step-title">Data Lineage Tracking</div>
+      <div class="fc-step-desc">For any planning cell, trace lineage: SAP MATNR → Import → Historical → Forecast → Planning Cell → Approval → ERP Push. Visual lineage graph. Shows data provenance for regulatory audit: "this value came from SAP on 2026-01-14 14:23 IST".</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">Lineage graph</span><span class="step-chip sc-orange">SAP → ERP trace</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 19.7</div>
+      <div class="fc-step-title">Data Retention Policy</div>
+      <div class="fc-step-desc">Admin sets: planning data retained 7 years (India statutory), audit logs 2 years, ML model artifacts 1 year, temp imports 30 days. Automated nightly S3 lifecycle + PG partition drop jobs enforce policy. Deletion logged.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-dim">7yr plan data</span><span class="step-chip sc-orange">S3 lifecycle</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 19.8</div>
+      <div class="fc-step-title">Schema Version Control</div>
+      <div class="fc-step-desc">Every Metadata Engine schema change versioned: schema_v1 → v2 → v3. Each version stored with diff, who changed it, migration SQL. Rollback: admin can revert to previous schema version with impact preview (affected workspaces shown).</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">Schema versioning</span><span class="step-chip sc-blue">Rollback preview</span></div>
+    </div>
+  </div>
+  <div class="phase-footer">
+    <div class="pf-block"><div class="pf-label">System Events</div><div class="pf-val">audit_event logged on every write · gdpr.export.requested · schema.version.changed · retention.job.ran (nightly)</div></div>
+    <div class="pf-block"><div class="pf-label">Output</div><div class="pf-val">Full immutable audit trail · GDPR compliance ready · SOC 2 evidence exportable · Data lineage traceable end-to-end</div></div>
+  </div>
+</div>
+
+<div class="ph-conn">↓ Admin enables API access for external integrations</div>
+
+<!-- ─── PHASE 20 ─── -->
+<div class="phase-block">
+  <div class="phase-hdr phdr-purple">
+    <span class="ph-num">PHASE 20</span>
+    <span class="ph-title">API Management, Webhooks &amp; Developer Portal</span>
+    <span class="ph-actor ph-ad">Admin + Developer</span>
+  </div>
+  <div class="steps-row">
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 20.1</div>
+      <div class="fc-step-title">Generate API Key</div>
+      <div class="fc-step-desc">Go to Settings → API & Integrations → New API Key. Set name "PowerBI-Integration", scope: read:planning read:reports. Key shown once (SHA256 hashed in PG). Rate limit inherited from subscription plan (Enterprise = 10K req/min).</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">Scoped key</span><span class="step-chip sc-red">One-time show</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 20.2</div>
+      <div class="fc-step-title">API Documentation Portal</div>
+      <div class="fc-step-desc">Swagger UI auto-generated from Fastify OpenAPI plugin at api.supplychain.com/docs. Interactive — test endpoints with real data in sandbox tenant. Docs versioned: v1/v2. SDK downloads: JS, Python, Java.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">Swagger UI</span><span class="step-chip sc-green">JS/Python SDK</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 20.3</div>
+      <div class="fc-step-title">Webhook Configuration</div>
+      <div class="fc-step-desc">Register webhook endpoint: https://erp.chemcorp.com/webhooks/supplyiq. Subscribe to events: plan.approved, forecast.completed, anomaly.detected. HMAC-SHA256 signature on each payload. Retry: 3× with exponential backoff.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">HMAC-SHA256</span><span class="step-chip sc-dim">3× retry</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 20.4</div>
+      <div class="fc-step-title">OAuth2 App Registration</div>
+      <div class="fc-step-desc">Register third-party apps (Tableau, custom BI tools) as OAuth2 clients. Authorization Code flow with PKCE. Scopes: read:workspace, write:cells, read:forecast. Token expiry 1h, refresh tokens 30 days. Token revocation supported.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">OAuth2 PKCE</span><span class="step-chip sc-blue">Scoped tokens</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 20.5</div>
+      <div class="fc-step-title">API Rate Limit Monitoring</div>
+      <div class="fc-step-desc">Admin dashboard shows: API calls today (8,420/10,000 limit), top consumers, slowest endpoints (P99 latency), error rate (0.02%). Kong rate-limit plugin enforces limits. Near-limit warning email at 80%.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">Kong rate-limit</span><span class="step-chip sc-dim">80% warning</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 20.6</div>
+      <div class="fc-step-title">Event Streaming (Kafka)</div>
+      <div class="fc-step-desc">Enterprise plan: direct Kafka topic access for real-time event streaming. Client subscribes to tenant.{id}.events topic. Events: cell.changed, plan.status.changed, forecast.updated. Confluent Schema Registry enforces Avro schema.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-teal">Kafka direct</span><span class="step-chip sc-blue">Avro schema</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 20.7</div>
+      <div class="fc-step-title">Webhook Delivery Log</div>
+      <div class="fc-step-desc">Webhook delivery history: timestamp, event type, payload size, response code, latency. Failed deliveries shown in red with retry status. Admin can manually re-trigger failed webhooks. 30-day delivery log retention.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-dim">Delivery log</span><span class="step-chip sc-red">Manual re-trigger</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 20.8</div>
+      <div class="fc-step-title">Sandbox Environment</div>
+      <div class="fc-step-desc">Every tenant gets a free sandbox subdomain (chemcorp-sandbox.supplychain.com) with mock data. Developers test API integrations safely. Sandbox resets weekly. No Stripe billing. Kong labels sandbox requests with X-Env: sandbox header.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-green">Sandbox env</span><span class="step-chip sc-dim">Weekly reset</span></div>
+    </div>
+  </div>
+  <div class="phase-footer">
+    <div class="pf-block"><div class="pf-label">System Events</div><div class="pf-val">api_key.created · webhook.registered · oauth2.client.created · api.rate_limit.near (at 80%) · webhook.delivered</div></div>
+    <div class="pf-block"><div class="pf-label">Output</div><div class="pf-val">API key active · Webhooks firing · OAuth2 apps connected · Power BI + Tableau integrated · Sandbox available</div></div>
+  </div>
+</div>
+
+<div class="ph-conn">↓ Superadmin monitors platform health and scales infrastructure</div>
+
+<!-- ─── PHASE 21 ─── -->
+<div class="phase-block">
+  <div class="phase-hdr phdr-red">
+    <span class="ph-num">PHASE 21</span>
+    <span class="ph-title">Platform Health, System Administration &amp; Infrastructure Scaling</span>
+    <span class="ph-actor ph-sa">Superadmin + DevOps</span>
+  </div>
+  <div class="steps-row">
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 21.1</div>
+      <div class="fc-step-title">System Health Dashboard</div>
+      <div class="fc-step-desc">Grafana at grafana.supplychain.com: CPU/memory per pod, DB connection pool (PG 84/200 active), Redis hit rate 98.4%, Kafka consumer lag (max 240ms), API P99 latency 487ms, error rate 0.018%.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-teal">Grafana</span><span class="step-chip sc-green">P99 487ms</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 21.2</div>
+      <div class="fc-step-title">All Tenants Overview</div>
+      <div class="fc-step-desc">Superadmin sees all tenant cards: name, plan tier, active users, last login, API usage %, storage used, billing status. Filter: overdue payments, high-usage tenants. Quick-link to impersonate tenant for support.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">Tenant grid</span><span class="step-chip sc-red">Impersonate</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 21.3</div>
+      <div class="fc-step-title">Job Queue Monitor</div>
+      <div class="fc-step-desc">BullMQ dashboard (Bull-Board UI embedded): queue depth, active/waiting/failed jobs per queue. forecast-run: 3 active, 12 waiting. erp-sync: 1 failed (SAP timeout). One-click retry failed jobs. Dead-letter queue inspection.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-purple">Bull-Board UI</span><span class="step-chip sc-red">Dead-letter queue</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 21.4</div>
+      <div class="fc-step-title">Auto-Scale Operations</div>
+      <div class="fc-step-desc">Kubernetes HPA monitors CPU: Cube Engine scales 5 → 14 pods when S&OP week load spikes. HPA config: min 5, max 20, CPU target 65%. Prometheus KEDA scaler for BullMQ queue depth (scale when queue &gt; 50 jobs).</div>
+      <div class="fc-step-detail"><span class="step-chip sc-teal">HPA 5→20 pods</span><span class="step-chip sc-blue">KEDA queue scaler</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 21.5</div>
+      <div class="fc-step-title">Distributed Tracing</div>
+      <div class="fc-step-desc">Jaeger UI shows request trace: user cell edit → Kong → API Service → Formula Engine → Cube Engine → PG → Redis → WS push. Total span: 342ms. Identifies bottleneck: Formula Engine dep-graph lookup taking 89ms.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-orange">Jaeger trace</span><span class="step-chip sc-dim">OpenTelemetry</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 21.6</div>
+      <div class="fc-step-title">Log Aggregation (Loki)</div>
+      <div class="fc-step-desc">Grafana Loki aggregates logs from all pods. LogQL query: {service="formula-engine"} |= "ERROR". Correlate log lines with Jaeger trace IDs. Set log-based alert: if ERROR rate &gt; 5/min → PagerDuty page.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-blue">Loki + LogQL</span><span class="step-chip sc-red">PagerDuty alert</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 21.7</div>
+      <div class="fc-step-title">Maintenance Mode</div>
+      <div class="fc-step-desc">Schedule maintenance window for tenant: toggle "Maintenance Mode" per tenant. All requests return 503 with custom banner: "SupplyIQ scheduled maintenance 02:00–04:00 IST". Users notified 24h before via email + in-app.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-dim">503 + banner</span><span class="step-chip sc-orange">24h notice</span></div>
+    </div>
+    <div class="fc-step">
+      <div class="fc-step-n">STEP 21.8</div>
+      <div class="fc-step-title">Disaster Recovery &amp; Backup</div>
+      <div class="fc-step-desc">PG continuous WAL archiving to S3. Point-in-time recovery to any second within 7 days. ClickHouse nightly snapshot to S3. Redis RDB + AOF persistence. Cross-region replication (Mumbai primary → Singapore DR). RTO: &lt;1h, RPO: &lt;5min.</div>
+      <div class="fc-step-detail"><span class="step-chip sc-red">RTO &lt;1h</span><span class="step-chip sc-orange">RPO &lt;5min</span><span class="step-chip sc-teal">Cross-region</span></div>
+    </div>
+  </div>
+  <div class="phase-footer">
+    <div class="pf-block"><div class="pf-label">System Events</div><div class="pf-val">hpa.scaleUp (5→14 pods) · job.failed → dead-letter · backup.completed (nightly) · trace.sampled (1% always-on)</div></div>
+    <div class="pf-block"><div class="pf-label">Output</div><div class="pf-val">Platform health visible · Auto-scaling active · DR strategy in place · Traces + logs correlated · All tenants monitored</div></div>
+  </div>
+</div>
+
+<!-- footer -->
+<p style="text-align:center;font-size:.6rem;color:var(--dim);margin-top:22px">
+  SupplyIQ by SVIQ Solutions &nbsp;·&nbsp; app.supplychain.com &nbsp;·&nbsp; A→Z Application Flow &nbsp;·&nbsp; 15 Phases &nbsp;·&nbsp; 2026
+</p>
+
+</div><!-- /af-canvas -->
+</div><!-- /tab-flow -->
+
+<script>
+// ─── TAB SWITCHING ───
+function switchTab(id) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.getAttribute('onclick') === "switchTab('" + id + "')") b.classList.add('active');
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // stagger phase blocks when flow tab opens
+  if (id === 'flow') {
+    document.querySelectorAll('.phase-block').forEach((el, i) => {
+      el.style.animationDelay = (i * 0.06) + 's';
+    });
+  }
+}
+
+// ─── TOOLTIP ───
+const tip = document.getElementById('tip');
+document.querySelectorAll('[data-tip]').forEach(el => {
+  el.addEventListener('mouseenter', () => { tip.textContent = el.dataset.tip; tip.style.opacity = '1'; });
+  el.addEventListener('mousemove', e => {
+    const x = e.clientX + 15, y = e.clientY + 15;
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    tip.style.left = (x + w > window.innerWidth  ? x - w - 30 : x) + 'px';
+    tip.style.top  = (y + h > window.innerHeight ? y - h - 30 : y) + 'px';
+  });
+  el.addEventListener('mouseleave', () => { tip.style.opacity = '0'; });
+});
+
+// ─── STAGGER node animations ───
+document.querySelectorAll('.node').forEach((n, i) => {
+  n.style.animationDelay = (i * 0.025) + 's';
+});
+</script>
+</body>
+</html>
